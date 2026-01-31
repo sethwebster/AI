@@ -28,6 +28,131 @@ Enterprise-grade guidelines for building production systems with AI agents.
 - Database constraints are your last line of defense
 - Type systems prevent bugs, runtime checks prevent disasters
 
+## Agent Orchestration
+
+### Parallel Execution for Efficiency
+
+**CRITICAL**: When facing multiple independent tasks, spawn parallel agents rather than executing sequentially.
+
+**Workflow**:
+1. Identify tasks that can run concurrently (no dependencies between them)
+2. Spawn separate agents for each independent task
+3. Agents communicate progress via files (not direct messaging)
+4. Monitor spawned agents through their output files
+5. Aggregate results when all agents complete
+
+**Benefits**:
+- Dramatically reduced total execution time
+- Better resource utilization
+- Clear separation of concerns
+- Easier debugging (each agent has isolated scope)
+
+### Agent Communication via Files
+
+Spawned agents MUST communicate through files, not direct API calls or shared memory:
+
+- **Status updates**: Write to `agents/{agent-name}/status.md`
+- **Progress logs**: Write to `agents/{agent-name}/progress.log`
+- **Results**: Write to `agents/{agent-name}/results.json` or `results.md`
+- **Errors**: Write to `agents/{agent-name}/errors.log`
+
+**Pattern**:
+```typescript
+// ✅ CORRECT - File-based communication
+async function spawnAgent(name: string, task: string) {
+  const agentDir = `agents/${name}`
+  await fs.mkdir(agentDir, { recursive: true })
+  
+  // Agent writes status updates to file
+  await fs.writeFile(`${agentDir}/status.md`, `# ${name}\n\nStatus: Starting...`)
+  
+  // Spawn agent with task
+  // Agent updates file as it progresses
+}
+
+// ❌ WRONG - Direct communication
+async function spawnAgent(name: string, task: string) {
+  // Don't rely on shared state or callbacks
+  const sharedState = {} // Bad!
+}
+```
+
+### Agent Naming Conventions
+
+**REQUIRED**: Every spawned agent MUST have a memorable, themed name. Never use generic identifiers.
+
+**Naming Rules**:
+- ❌ Never use: "Agent 1", "Agent A", "Worker 1", "Task-123"
+- ✅ Always use: Themed, memorable names
+
+**Themes** (pick one per spawning session):
+- **Colors**: Chartreuse, Vermillion, Cerulean, Magenta
+- **Simpsons Characters**: Homer, Marge, Bart, Lisa, Maggie
+- **Famous Actors**: Bill, Meryl, Denzel, Viola
+- **Cities**: Tokyo, Paris, Cairo, Sydney
+- **Planets**: Mercury, Venus, Mars, Jupiter
+- **Elements**: Helium, Neon, Argon, Krypton
+- **Mythology**: Athena, Apollo, Hermes, Artemis
+
+**Examples**:
+```typescript
+// ✅ CORRECT - Themed names
+const agents = [
+  { name: 'Chartreuse', task: 'Refactor auth service' },
+  { name: 'Vermillion', task: 'Optimize database queries' },
+  { name: 'Cerulean', task: 'Write integration tests' }
+]
+
+// ✅ CORRECT - Different theme
+const agents = [
+  { name: 'Homer', task: 'Build dashboard UI' },
+  { name: 'Marge', task: 'Implement API endpoints' },
+  { name: 'Bart', task: 'Fix bug in payment flow' }
+]
+
+// ❌ WRONG - Generic names
+const agents = [
+  { name: 'Agent 1', task: '...' },
+  { name: 'Worker A', task: '...' },
+  { name: 'Task-123', task: '...' }
+]
+```
+
+**Theme Selection**:
+- Choose a theme that fits the work context (e.g., colors for UI work, mythology for complex systems)
+- Use the same theme for all agents spawned in a single session
+- Document the theme choice in the spawning agent's notes
+- Keep names short (1-2 words) and easy to reference
+
+### Monitoring Spawned Agents
+
+Check agent status by reading their status files:
+
+```typescript
+async function checkAgentStatus(name: string) {
+  const statusFile = `agents/${name}/status.md`
+  if (await fs.exists(statusFile)) {
+    const status = await fs.readFile(statusFile, 'utf-8')
+    return parseStatus(status)
+  }
+  return { status: 'not_started' }
+}
+
+async function waitForAgents(names: string[]) {
+  while (true) {
+    const statuses = await Promise.all(
+      names.map(name => checkAgentStatus(name))
+    )
+    
+    if (statuses.every(s => s.status === 'completed' || s.status === 'failed')) {
+      return statuses
+    }
+    
+    await sleep(5000) // Check every 5 seconds
+  }
+}
+```
+
 ## Feature Development Process
 
 ### User Stories Are Non-Negotiable
