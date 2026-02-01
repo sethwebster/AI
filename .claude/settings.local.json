@@ -4,7 +4,16 @@
       "Bash(gh repo create:*)",
       "Bash(ln:*)",
       "Bash(ls:*)",
-      "Bash(readlink:*)"
+      "Bash(readlink:*)",
+      "Bash(source:*)",
+      "Bash(ai init:*)",
+      "Bash(ai list:*)",
+      "Bash(ai forget)",
+      "Bash(git -C /Users/sethwebster/Development/AI status)",
+      "Bash(git -C /Users/sethwebster/Development/AI add:*)",
+      "Bash(git -C /Users/sethwebster/Development/AI log --oneline -5)",
+      "Bash(ai)",
+      "Bash(ai help)"
     ]
   }
 }
