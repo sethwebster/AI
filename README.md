@@ -69,8 +69,11 @@ AI/
 ### AI CLI
 
 ```bash
-ai init    # Initialize directory with AGENTS.md and AGENT-WORKSPACE.md
-ai update  # Update local repo with latest changes
+ai init        # Initialize directory with AGENTS.md and AGENT-WORKSPACE.md
+ai update      # Update local repo with latest changes
+ai update-all  # Update all registered directories
+ai list        # List all registered directories
+ai forget      # Remove current directory from registry
 ```
 
 ### How `ai init` Works
@@ -80,8 +83,19 @@ ai update  # Update local repo with latest changes
    - `AGENTS.md` → `~/.ai-repo-local-clone/AGENTS.md`
    - `CLAUDE.md` → `~/.ai-repo-local-clone/CLAUDE.md`
 3. **Copy template**: Copies `AGENT-WORKSPACE.md` template (if not exists)
+4. **Register directory**: Adds current directory to `~/.ai-registry` for bulk updates
 
 This means your `AGENTS.md` and `CLAUDE.md` always stay up-to-date via symlinks. Run `ai update` to refresh the local repo.
+
+### Registry System
+
+The registry tracks all initialized directories to enable bulk updates:
+
+- **`ai list`** - Shows all registered directories (marks missing ones with ✗)
+- **`ai update-all`** - Updates all registered directories in one command
+- **`ai forget`** - Removes current directory from registry (doesn't delete files)
+
+Registry location: `~/.ai-registry` (plain text, one path per line)
 
 ### For AI Agents
 

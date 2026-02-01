@@ -2,6 +2,37 @@
 ai() {
 	local cmd="$1"
 	shift
+
+	# Helper: Register current directory
+	_ai_register_directory() {
+		local REGISTRY="$HOME/.ai-registry"
+		local CURRENT_DIR="$(pwd)"
+
+		# Create registry if it doesn't exist
+		touch "$REGISTRY"
+
+		# Check if already registered
+		if grep -Fxq "$CURRENT_DIR" "$REGISTRY" 2>/dev/null; then
+			return 0
+		fi
+
+		# Add to registry
+		echo "$CURRENT_DIR" >> "$REGISTRY"
+	}
+
+	# Helper: Unregister current directory
+	_ai_unregister_directory() {
+		local REGISTRY="$HOME/.ai-registry"
+		local CURRENT_DIR="$(pwd)"
+
+		if [ ! -f "$REGISTRY" ]; then
+			return 0
+		fi
+
+		# Remove from registry
+		grep -Fxv "$CURRENT_DIR" "$REGISTRY" > "$REGISTRY.tmp" && mv "$REGISTRY.tmp" "$REGISTRY"
+	}
+
 	case "$cmd" in
 		init)
 			bat <<'EOF'
@@ -92,6 +123,9 @@ EOF
 				echo "ℹ️  AGENT-WORKSPACE.md already exists, skipping"
 			fi
 
+			# Register this directory
+			_ai_register_directory
+
 			echo ""
 			echo "📖 Review the best practices:"
 			echo "   cat AGENTS.md"
@@ -157,12 +191,85 @@ EOF
 			echo "   source $SHELL_RC"
 			;;
 
+		update-all)
+			local REGISTRY="$HOME/.ai-registry"
+
+			if [ ! -f "$REGISTRY" ]; then
+				echo "❌ No registered directories found"
+				echo "   Run 'ai init' in a directory first"
+				return 1
+			fi
+
+			local TOTAL=$(wc -l < "$REGISTRY" | tr -d ' ')
+			if [ "$TOTAL" -eq 0 ]; then
+				echo "❌ No registered directories found"
+				return 1
+			fi
+
+			echo "🔄 Updating all $TOTAL registered directories..."
+			echo ""
+
+			local SUCCESS=0
+			local FAILED=0
+			local CURRENT_DIR="$(pwd)"
+
+			while IFS= read -r dir; do
+				if [ ! -d "$dir" ]; then
+					echo "⚠️  Skipping (not found): $dir"
+					((FAILED++))
+					continue
+				fi
+
+				echo "📁 $dir"
+				(cd "$dir" && ai update 2>&1 | sed 's/^/   /')
+
+				if [ $? -eq 0 ]; then
+					((SUCCESS++))
+				else
+					((FAILED++))
+				fi
+				echo ""
+			done < "$REGISTRY"
+
+			cd "$CURRENT_DIR"
+
+			echo "✅ Update complete: $SUCCESS succeeded, $FAILED failed"
+			;;
+
+		list)
+			local REGISTRY="$HOME/.ai-registry"
+
+			if [ ! -f "$REGISTRY" ] || [ ! -s "$REGISTRY" ]; then
+				echo "No registered directories"
+				return 0
+			fi
+
+			echo "Registered directories:"
+			echo ""
+			cat "$REGISTRY" | while IFS= read -r dir; do
+				if [ -d "$dir" ]; then
+					echo "  ✓ $dir"
+				else
+					echo "  ✗ $dir (not found)"
+				fi
+			done
+			;;
+
+		forget)
+			local CURRENT_DIR="$(pwd)"
+			_ai_unregister_directory
+			echo "✅ Removed $CURRENT_DIR from registry"
+			;;
+
 		*)
 			echo "AI Development Best Practices CLI"
 			echo ""
 			echo "Usage:"
-			echo "  ai init    - Initialize directory with AGENTS.md and AGENT-WORKSPACE.md"
-			echo "  ai update  - Update local repo with latest changes"
+			echo "  ai init        - Initialize directory with AGENTS.md and AGENT-WORKSPACE.md"
+			echo "  ai update      - Update local repo with latest changes"
+			echo "  ai update-all  - Update all registered directories"
+			echo "  ai list        - List all registered directories"
+			echo "  ai forget      - Remove current directory from registry"
 			echo ""
 			return 1
 			;;
