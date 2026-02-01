@@ -70,7 +70,18 @@ AI/
 
 ```bash
 ai init    # Initialize directory with AGENTS.md and AGENT-WORKSPACE.md
+ai update  # Update local repo with latest changes
 ```
+
+### How `ai init` Works
+
+1. **Clone/update repo**: Clones or updates `~/.ai-repo-local-clone` (shallow clone)
+2. **Create symlinks**: Creates symlinks in current directory:
+   - `AGENTS.md` → `~/.ai-repo-local-clone/AGENTS.md`
+   - `CLAUDE.md` → `~/.ai-repo-local-clone/CLAUDE.md`
+3. **Copy template**: Copies `AGENT-WORKSPACE.md` template (if not exists)
+
+This means your `AGENTS.md` and `CLAUDE.md` always stay up-to-date via symlinks. Run `ai update` to refresh the local repo.
 
 ### For AI Agents
 

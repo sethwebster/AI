@@ -1,1 +1,1 @@
-/Users/sethwebster/.claude/CLAUDE.md
+AGENTS.md

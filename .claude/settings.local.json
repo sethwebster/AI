@@ -3,7 +3,8 @@
     "allow": [
       "Bash(gh repo create:*)",
       "Bash(ln:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(readlink:*)"
     ]
   }
 }
