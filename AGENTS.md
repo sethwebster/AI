@@ -1,5 +1,7 @@
 # Agent Development Guide
 
+**🤖 AGENTS: READ THIS FILE FIRST, THEN READ [AGENT-WORKSPACE.md](./AGENT-WORKSPACE.md) FOR WORKSPACE-SPECIFIC INFORMATION.**
+
 Enterprise-grade guidelines for building production systems with AI agents.
 
 ## Core Principles
@@ -466,9 +468,11 @@ Before accepting ADR:
 - [ ] Code reviewer approved
 - [ ] Links to related ADRs/issues
 
-## React Best Practices
+## Language-Specific Guidelines
 
-### Component Hierarchy
+### React
+
+#### Component Hierarchy
 ```typescript
 // ❌ WRONG - Business logic in component
 function UserProfile() {
@@ -502,14 +506,14 @@ function UserProfile() {
 }
 ```
 
-### Hook Guidelines
+#### Hook Guidelines
 - Never call `useEffect` directly in components
 - One hook per concern (don't combine unrelated logic)
 - Hooks must be pure (no side effects except in useEffect)
 - Always specify exhaustive dependencies
 - Extract complex effects to custom hooks
 
-### State Management
+#### State Management
 ```typescript
 // ❌ WRONG - Prop drilling
 <Parent>
@@ -534,12 +538,44 @@ function Parent() {
 }
 ```
 
-### Performance Rules
+#### Performance Rules
 - Memo only after profiling shows need
 - Don't optimize prematurely
 - `useCallback` for props passed to memoized components
 - `useMemo` for expensive computations only
 - Virtual scrolling for lists >100 items
+
+### Elixir
+
+#### Naming Conventions
+Elixir uses `snake_case` for variables, function names, and atoms, following the convention inherited from Erlang and common in Ruby:
+
+```elixir
+# ✅ CORRECT - Variables and functions
+my_variable = "value"
+calculate_total(items)
+:some_atom
+
+# ✅ CORRECT - Module names use PascalCase
+defmodule MyModule do
+  def my_function(param_name) do
+    # ...
+  end
+end
+
+defmodule GenServer do
+  # ...
+end
+
+# ❌ WRONG - Using camelCase
+myVariable = "value"
+calculateTotal(items)
+
+# ❌ WRONG - Using snake_case for modules
+defmodule my_module do
+  # ...
+end
+```
 
 ## TypeScript Standards
 
