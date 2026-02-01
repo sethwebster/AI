@@ -265,12 +265,13 @@ EOF
 			echo "AI Development Best Practices CLI"
 			echo ""
 			echo "Usage:"
-			echo "  ai init        - Initialize directory with AGENTS.md and AGENT-WORKSPACE.md"
-			echo "  ai update      - Update local repo with latest changes"
+			echo "  ai init        - Initialize directory with AI dev best practices"
+			echo "  ai update      - Update local repo and ai function"
 			echo "  ai update-all  - Update all registered directories"
-			echo "  ai list        - List all registered directories"
+			echo "  ai list        - List registered directories"
 			echo "  ai forget      - Remove current directory from registry"
 			echo ""
+			echo "Source: https://github.com/sethwebster/AI"
 			return 1
 			;;
 	esac
