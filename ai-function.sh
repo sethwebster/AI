@@ -67,11 +67,20 @@ EOF
 			# Clone or update the repo
 			if [ -d "$REPO_CLONE" ]; then
 				echo "📥 Updating local repo at $REPO_CLONE..."
-				(cd "$REPO_CLONE" && git pull --depth 1) || {
-					echo "⚠️  Failed to update repo, trying fresh clone..."
+				if ! (cd "$REPO_CLONE" && git pull --depth 1); then
+					echo ""
+					echo "⚠️  Local clone is out of sync with remote"
+					echo "   This will delete $REPO_CLONE and re-clone fresh"
+					printf "Force reset? (y/N) "
+					read -r REPLY
+					echo ""
+					if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+						echo "❌ Cancelled - local clone unchanged"
+						return 1
+					fi
 					rm -rf "$REPO_CLONE"
 					git clone --depth 1 "$REPO_URL" "$REPO_CLONE"
-				}
+				fi
 			else
 				echo "📥 Cloning repo to $REPO_CLONE..."
 				git clone --depth 1 "$REPO_URL" "$REPO_CLONE"
@@ -147,14 +156,23 @@ EOF
 			fi
 
 			echo "🔄 Updating AI development best practices..."
-			(cd "$REPO_CLONE" && git pull --depth 1) || {
-				echo "⚠️  Failed to update repo, trying fresh clone..."
+			if ! (cd "$REPO_CLONE" && git pull --depth 1); then
+				echo ""
+				echo "⚠️  Local clone is out of sync with remote"
+				echo "   This will delete $REPO_CLONE and re-clone fresh"
+				printf "Force reset? (y/N) "
+				read -r REPLY
+				echo ""
+				if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+					echo "❌ Cancelled - local clone unchanged"
+					return 1
+				fi
 				rm -rf "$REPO_CLONE"
-				git clone --depth 1 "$REPO_URL" "$REPO_CLONE" || {
+				if ! git clone --depth 1 "$REPO_URL" "$REPO_CLONE"; then
 					echo "❌ Failed to clone repo"
 					return 1
-				}
-			}
+				fi
+			fi
 
 			echo "✅ Successfully updated local repo"
 			echo "   Symlinked files (AGENTS.md, CLAUDE.md) now reflect latest changes"
