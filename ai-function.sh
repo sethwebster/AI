@@ -347,13 +347,13 @@ EOF
 			read -r SELECTION < /dev/tty
 			echo ""
 
-			# Define agents
+			# Define agents: filename:display_name:skill_name
 			local -a AGENTS=(
-				"neckbeard-code-reviewer:Sentinel (Morgan)"
-				"design-visionary:Conversion Architect (Avery)"
-				"docs-artisan:Docs Engineer (Sam)"
-				"technical-docs-artist:Docs Architect (Emerson)"
-				"e6-problem-solver:Systems Thinker (Jan)"
+				"neckbeard-code-reviewer:Sentinel (Morgan):sentinel"
+				"design-visionary:Conversion Architect (Avery):conversion-architect"
+				"docs-artisan:Docs Engineer (Sam):docs-engineer"
+				"technical-docs-artist:Docs Architect (Emerson):docs-architect"
+				"e6-problem-solver:Systems Thinker (Jan):systems-thinker"
 			)
 
 			local -a SELECTED_AGENTS=()
@@ -408,10 +408,9 @@ EOF
 
 						# Install selected agents
 						for agent_info in "${SELECTED_AGENTS[@]}"; do
-							local agent_type="${agent_info%%:*}"
-							local agent_name="${agent_info##*:}"
+							IFS=':' read -r agent_type agent_name skill_name <<< "$agent_info"
 							local source_file="$REPO_CLONE/agents/${agent_type}.md"
-							local dest_file="$AGENT_DIR/${agent_type}.md"
+							local dest_file="$AGENT_DIR/${skill_name}.md"
 
 							if [ -f "$source_file" ]; then
 								# Extract frontmatter from source
@@ -420,7 +419,7 @@ EOF
 								# Create Claude agent file with frontmatter
 								cat > "$dest_file" <<EOF
 ---
-name: ${agent_type}
+name: ${skill_name}
 description: ${description}
 tools: Read, Write, Edit, Glob, Grep, Bash, LSP
 model: sonnet
@@ -459,10 +458,9 @@ EOF
 
 						# Install selected agents as Codex skills
 						for agent_info in "${SELECTED_AGENTS[@]}"; do
-							local agent_type="${agent_info%%:*}"
-							local agent_name="${agent_info##*:}"
+							IFS=':' read -r agent_type agent_name skill_name <<< "$agent_info"
 							local source_file="$REPO_CLONE/agents/${agent_type}.md"
-							local skill_dir="$SKILLS_DIR/${agent_type}"
+							local skill_dir="$SKILLS_DIR/${skill_name}"
 							local dest_file="$skill_dir/SKILL.md"
 
 							if [ -f "$source_file" ]; then
@@ -474,7 +472,7 @@ EOF
 								# Create Codex SKILL.md with frontmatter
 								cat > "$dest_file" <<EOF
 ---
-name: ${agent_type}
+name: ${skill_name}
 description: ${description}
 ---
 
