@@ -26,6 +26,17 @@ case "$SHELL_NAME" in
         ;;
 esac
 
+# Resolve symlink if needed
+if [ -L "$SHELL_RC" ]; then
+    ACTUAL_RC=$(readlink "$SHELL_RC")
+    # Handle relative symlinks
+    if [[ "$ACTUAL_RC" != /* ]]; then
+        ACTUAL_RC="$(dirname "$SHELL_RC")/$ACTUAL_RC"
+    fi
+    echo "📝 Detected symlink: $SHELL_RC -> $ACTUAL_RC"
+    SHELL_RC="$ACTUAL_RC"
+fi
+
 echo "📥 Downloading ai function for $SHELL_NAME..."
 
 # Download the function
@@ -51,7 +62,10 @@ if grep -q "# AI Development CLI" "$SHELL_RC" 2>/dev/null; then
 
     # Remove old installation
     echo "🗑️  Removing old installation..."
-    sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > "$SHELL_RC.tmp" && mv "$SHELL_RC.tmp" "$SHELL_RC"
+    sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > /tmp/shell_rc_temp
+    chmod --reference="$SHELL_RC" /tmp/shell_rc_temp 2>/dev/null || chmod 644 /tmp/shell_rc_temp
+    cat /tmp/shell_rc_temp > "$SHELL_RC"
+    rm /tmp/shell_rc_temp
 fi
 
 echo "📝 Adding ai function to $SHELL_RC..."
