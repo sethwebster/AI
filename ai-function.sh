@@ -1,5 +1,5 @@
 # AI Development CLI
-AI_VERSION="1.0.1"
+AI_VERSION="1.1.0"
 
 ai() {
 	local cmd="$1"
@@ -212,6 +212,14 @@ EOF
 			echo ""
 			echo "⚠️  Reload your shell to use the updated function:"
 			echo "   source $SHELL_RC"
+			echo ""
+
+			# Run migrations
+			if [ -d "$REPO_CLONE/migrations" ]; then
+				echo "🔄 Checking for migrations..."
+				source "$SHELL_RC"
+				ai migrate up
+			fi
 			;;
 
 		update-all)
@@ -287,6 +295,136 @@ EOF
 		version|--version|-v)
 			echo "AI Development CLI v${AI_VERSION}"
 			echo "Source: https://github.com/sethwebster/AI"
+			;;
+
+		migrate)
+			local direction="${1:-up}"
+			local REPO_CLONE="$HOME/.ai-repo-local-clone"
+			local MIGRATION_STATE="$HOME/.ai-migration-state"
+
+			if [ ! -d "$REPO_CLONE/migrations" ]; then
+				echo "❌ No migrations directory found"
+				return 1
+			fi
+
+			# Create migration state file if it doesn't exist
+			touch "$MIGRATION_STATE"
+
+			case "$direction" in
+				up)
+					echo "🔄 Running migrations..."
+					echo ""
+
+					# Get list of applied migrations
+					local applied_migrations=$(cat "$MIGRATION_STATE" 2>/dev/null || echo "")
+
+					# Run each migration
+					for migration_file in "$REPO_CLONE/migrations"/*.sh; do
+						if [ ! -f "$migration_file" ]; then
+							continue
+						fi
+
+						local migration_id=$(basename "$migration_file" .sh)
+
+						# Check if already applied
+						if echo "$applied_migrations" | grep -q "^${migration_id}$"; then
+							echo "⏭️  $migration_id (already applied)"
+							continue
+						fi
+
+						echo "▶️  $migration_id"
+
+						# Source the migration
+						source "$migration_file"
+
+						# Run migration_up
+						if migration_up; then
+							# Mark as applied
+							echo "$migration_id" >> "$MIGRATION_STATE"
+							echo ""
+						else
+							echo "  ❌ Migration failed"
+							return 1
+						fi
+					done
+
+					echo "✅ All migrations complete"
+					;;
+
+				down)
+					echo "🔄 Rolling back last migration..."
+					echo ""
+
+					# Get last applied migration
+					local last_migration=$(tail -1 "$MIGRATION_STATE" 2>/dev/null)
+
+					if [ -z "$last_migration" ]; then
+						echo "ℹ️  No migrations to roll back"
+						return 0
+					fi
+
+					local migration_file="$REPO_CLONE/migrations/${last_migration}.sh"
+
+					if [ ! -f "$migration_file" ]; then
+						echo "❌ Migration file not found: $migration_file"
+						return 1
+					fi
+
+					echo "◀️  $last_migration"
+
+					# Source the migration
+					source "$migration_file"
+
+					# Run migration_down
+					if migration_down; then
+						# Remove from applied migrations
+						grep -v "^${last_migration}$" "$MIGRATION_STATE" > "$MIGRATION_STATE.tmp"
+						mv "$MIGRATION_STATE.tmp" "$MIGRATION_STATE"
+						echo ""
+						echo "✅ Rollback complete"
+					else
+						echo "  ❌ Rollback failed"
+						return 1
+					fi
+					;;
+
+				status)
+					echo "Migration Status"
+					echo ""
+					echo "Applied migrations:"
+					if [ -s "$MIGRATION_STATE" ]; then
+						cat "$MIGRATION_STATE" | sed 's/^/  ✅ /'
+					else
+						echo "  (none)"
+					fi
+					echo ""
+					echo "Pending migrations:"
+					local has_pending=0
+					for migration_file in "$REPO_CLONE/migrations"/*.sh; do
+						if [ ! -f "$migration_file" ]; then
+							continue
+						fi
+						local migration_id=$(basename "$migration_file" .sh)
+						if ! grep -q "^${migration_id}$" "$MIGRATION_STATE" 2>/dev/null; then
+							echo "  ⏸️  $migration_id"
+							has_pending=1
+						fi
+					done
+					if [ $has_pending -eq 0 ]; then
+						echo "  (none)"
+					fi
+					;;
+
+				*)
+					echo "Usage: ai migrate [up|down|status]"
+					echo ""
+					echo "Commands:"
+					echo "  up     - Apply pending migrations (default)"
+					echo "  down   - Rollback last migration"
+					echo "  status - Show migration status"
+					return 1
+					;;
+			esac
 			;;
 
 		install)
@@ -514,8 +652,9 @@ EOF
 			echo "Usage:"
 			echo "  ai init           - Initialize directory with AI dev best practices"
 			echo "  ai install agents - Install agent definitions into Claude/Codex"
-			echo "  ai update         - Update local repo and ai function"
+			echo "  ai update         - Update local repo, ai function, and run migrations"
 			echo "  ai update-all     - Update all registered directories"
+			echo "  ai migrate        - Run pending migrations (up|down|status)"
 			echo "  ai list           - List registered directories"
 			echo "  ai forget         - Remove current directory from registry"
 			echo "  ai version        - Show version information"
