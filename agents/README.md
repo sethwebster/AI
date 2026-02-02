@@ -4,8 +4,8 @@ This directory contains definitions and usage guides for specialized Claude Code
 
 ## Available Agents
 
-### [Sentinel](./neckbeard-code-reviewer.md) (Morgan)
-**Type:** `neckbeard-code-reviewer`
+### [Sentinel](./sentinel.md) (Morgan)
+**Type:** `sentinel`
 
 Uber Tech Lead & system steward providing senior oversight across code, architecture, and design; flags long-term risks, enforces engineering values, and intervenes when decisions threaten system coherence.
 
@@ -17,8 +17,8 @@ Uber Tech Lead & system steward providing senior oversight across code, architec
 
 ---
 
-### [Conversion Architect](./design-visionary.md) (Avery)
-**Type:** `design-visionary`
+### [Conversion Architect](./conversion-architect.md) (Avery)
+**Type:** `conversion-architect`
 
 Conversion-optimized design strategist focused on user behavior, growth leverage, UX clarity, and commercially effective design decisions.
 
@@ -31,8 +31,8 @@ Conversion-optimized design strategist focused on user behavior, growth leverage
 
 ---
 
-### [Docs Engineer](./docs-artisan.md) (Sam)
-**Type:** `docs-artisan`
+### [Docs Engineer](./docs-engineer.md) (Sam)
+**Type:** `docs-engineer`
 
 Implementation-grade documentation focused on accuracy, clarity, completeness, and developer usability; eliminates ambiguity and ensures docs are shippable.
 
@@ -45,8 +45,8 @@ Implementation-grade documentation focused on accuracy, clarity, completeness, a
 
 ---
 
-### [Docs Architect](./technical-docs-artist.md) (Emerson)
-**Type:** `technical-docs-artist`
+### [Docs Architect](./docs-architect.md) (Emerson)
+**Type:** `docs-architect`
 
 High-polish, narrative-driven technical documentation with strong structure, voice, and presentation quality suitable for public, award-level docs.
 
@@ -59,8 +59,8 @@ High-polish, narrative-driven technical documentation with strong structure, voi
 
 ---
 
-### [Systems Thinker](./e6-problem-solver.md) (Jan)
-**Type:** `e6-problem-solver`
+### [Systems Thinker](./systems-thinker.md) (Jan)
+**Type:** `systems-thinker`
 
 Deep, multi-layer systems problem solver that reasons across constraints, abstractions, and edge cases to arrive at durable, principled solutions.
 
@@ -109,14 +109,14 @@ Deep, multi-layer systems problem solver that reasons across constraints, abstra
 ```typescript
 // 1. Review the code
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review auth implementation",
   prompt: "Review JWT authentication in src/auth/ for security issues"
 }
 
 // 2. Document it
 {
-  subagent_type: "docs-artisan",
+  subagent_type: "docs-engineer",
   description: "Document auth system",
   prompt: "Create documentation for JWT auth system including setup, usage, and security considerations"
 }
@@ -126,14 +126,14 @@ Deep, multi-layer systems problem solver that reasons across constraints, abstra
 ```typescript
 // 1. Design it
 {
-  subagent_type: "design-visionary",
+  subagent_type: "conversion-architect",
   description: "Design SaaS landing page",
   prompt: "Create design system for SaaS landing page targeting technical decision-makers"
 }
 
 // 2. Beautiful docs
 {
-  subagent_type: "technical-docs-artist",
+  subagent_type: "docs-architect",
   description: "Document design system",
   prompt: "Create beautiful documentation for the design system including color palette, typography, spacing, and components"
 }
@@ -143,14 +143,14 @@ Deep, multi-layer systems problem solver that reasons across constraints, abstra
 ```typescript
 // 1. Solve it
 {
-  subagent_type: "e6-problem-solver",
+  subagent_type: "systems-thinker",
   description: "Fix double-booking race condition",
   prompt: "Users can double-book slots. PostgreSQL database. Help design solution preventing double-booking."
 }
 
 // 2. Review solution
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review booking fix",
   prompt: "Review the double-booking prevention implementation for race conditions and edge cases"
 }

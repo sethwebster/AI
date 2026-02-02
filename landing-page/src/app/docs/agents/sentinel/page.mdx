@@ -4,7 +4,7 @@ Uber Tech Lead & system steward providing senior oversight across code, architec
 
 ## Overview
 
-**Agent Type:** `neckbeard-code-reviewer`
+**Agent Type:** `sentinel`
 **Persona:** Morgan
 **Expertise:** Security, architecture, code quality
 
@@ -49,7 +49,7 @@ Sentinel excels at:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review auth implementation",
   prompt: "Review JWT authentication in src/auth/ for security vulnerabilities, race conditions, and architectural concerns. Focus on token refresh logic and session management."
 }
@@ -75,7 +75,7 @@ Sentinel excels at:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review booking refactor",
   prompt: "Evaluate the booking system refactor in src/bookings/. Check for separation of concerns, remaining coupling between components and services, and edge cases in cancellation flow."
 }
@@ -100,7 +100,7 @@ Sentinel excels at:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review caching layer",
   prompt: "Review caching implementation in src/settings/. Focus on cache invalidation, serialization issues (especially Dates), and race conditions when updating cached data."
 }
@@ -125,7 +125,7 @@ Sentinel excels at:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review query optimization",
   prompt: "Review database query optimization in src/dashboard/stats.ts. Check for N+1 queries, proper indexing, and SQL injection vulnerabilities."
 }
@@ -148,7 +148,7 @@ Sentinel excels at:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Brief description (3-5 words)",
   prompt: "Detailed prompt with context and focus areas"
 }
@@ -160,7 +160,7 @@ Sentinel excels at:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review code",
   prompt: "Check my code for issues"
 }
@@ -170,7 +170,7 @@ Sentinel excels at:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review payment integration",
   prompt: "Review Stripe payment integration in src/payments/ for security vulnerabilities, error handling, and idempotency. Focus on webhook signature verification and race conditions in charge creation."
 }

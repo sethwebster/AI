@@ -24,7 +24,7 @@ Use **Sentinel (Morgan)** for rigorous code review:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review auth implementation",
   prompt: "Review JWT authentication in src/auth/ for security issues"
 }
@@ -36,7 +36,7 @@ Use **Conversion Architect (Avery)** for UX and growth:
 
 ```typescript
 {
-  subagent_type: "design-visionary",
+  subagent_type: "conversion-architect",
   description: "Design landing page",
   prompt: "Create design system for SaaS landing page targeting developers"
 }
@@ -48,7 +48,7 @@ Use **Docs Engineer (Sam)** for clear, accurate docs:
 
 ```typescript
 {
-  subagent_type: "docs-artisan",
+  subagent_type: "docs-engineer",
   description: "Document API",
   prompt: "Create documentation for auth API including setup, usage, and examples"
 }
@@ -60,7 +60,7 @@ Use **Docs Architect (Emerson)** for award-quality presentation:
 
 ```typescript
 {
-  subagent_type: "technical-docs-artist",
+  subagent_type: "docs-architect",
   description: "Polish README",
   prompt: "Elevate the README with beautiful formatting and narrative flow"
 }
@@ -72,7 +72,7 @@ Use **Systems Thinker (Jan)** for deep analysis:
 
 ```typescript
 {
-  subagent_type: "e6-problem-solver",
+  subagent_type: "systems-thinker",
   description: "Fix race condition",
   prompt: "Users can double-book slots. PostgreSQL database. Design solution."
 }
@@ -122,7 +122,7 @@ Use multiple agents for complex workflows:
 ```typescript
 // 1. Design it
 {
-  subagent_type: "design-visionary",
+  subagent_type: "conversion-architect",
   description: "Design SaaS landing page",
   prompt: "Create design system for SaaS landing targeting technical decision-makers"
 }
@@ -132,14 +132,14 @@ Use multiple agents for complex workflows:
 
 // 3. Review code
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review landing page",
   prompt: "Review landing page implementation for performance and accessibility"
 }
 
 // 4. Document design system
 {
-  subagent_type: "technical-docs-artist",
+  subagent_type: "docs-architect",
   description: "Document design system",
   prompt: "Create beautiful documentation for the design system"
 }
@@ -150,7 +150,7 @@ Use multiple agents for complex workflows:
 ```typescript
 // 1. Design solution
 {
-  subagent_type: "e6-problem-solver",
+  subagent_type: "systems-thinker",
   description: "Design booking system",
   prompt: "Design a booking system that prevents double-booking and handles cancellations"
 }
@@ -160,14 +160,14 @@ Use multiple agents for complex workflows:
 
 // 3. Security review
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review booking security",
   prompt: "Review booking system for race conditions and edge cases"
 }
 
 // 4. Document API
 {
-  subagent_type: "docs-artisan",
+  subagent_type: "docs-engineer",
   description: "Document booking API",
   prompt: "Create API documentation for the booking endpoints"
 }
@@ -188,7 +188,7 @@ More context = better results:
 **Bad:**
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review code",
   prompt: "Check my code"
 }
@@ -197,7 +197,7 @@ More context = better results:
 **Good:**
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review auth implementation",
   prompt: "Review JWT authentication in src/auth/ for security vulnerabilities, race conditions, and token refresh edge cases. Focus on session management and token expiration."
 }
@@ -260,11 +260,11 @@ Using the Task tool:
 
 | Agent | Type |
 |-------|------|
-| Sentinel | `neckbeard-code-reviewer` |
-| Conversion Architect | `design-visionary` |
-| Docs Engineer | `docs-artisan` |
-| Docs Architect | `technical-docs-artist` |
-| Systems Thinker | `e6-problem-solver` |
+| Sentinel | `sentinel` |
+| Conversion Architect | `conversion-architect` |
+| Docs Engineer | `docs-engineer` |
+| Docs Architect | `docs-architect` |
+| Systems Thinker | `systems-thinker` |
 
 ---
 

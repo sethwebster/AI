@@ -489,7 +489,7 @@ How we'll verify this decision was correct:
    - Explain why rejected options weren't chosen
 
 2. **Get Code Review Sign-off**
-   - After creating ADR, use Task tool with `subagent_type='neckbeard-code-reviewer'`
+   - After creating ADR, use Task tool with `subagent_type='sentinel'`
    - Provide detailed description: "Review ADR-XXX for [architectural decision]. Focus on: [specific concerns like security, performance, maintainability]."
    - Address all feedback before proceeding
    - Update ADR based on review comments
@@ -506,7 +506,7 @@ How we'll verify this decision was correct:
 echo "# ADR-015: Switch to Drizzle ORM..." > adr/adr-015-drizzle-orm.md
 
 # 2. Agent invokes code reviewer
-# Uses Task tool: subagent_type='neckbeard-code-reviewer'
+# Uses Task tool: subagent_type='sentinel'
 # Prompt: "Review ADR-015 for ORM migration decision. Focus on: migration
 # safety, performance implications, type safety, and developer experience."
 

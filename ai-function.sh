@@ -790,11 +790,11 @@ ai() {
 			echo ""
 
 			local -a AGENTS=(
-				"neckbeard-code-reviewer:Sentinel (Morgan):sentinel"
-				"design-visionary:Conversion Architect (Avery):conversion-architect"
-				"docs-artisan:Docs Engineer (Sam):docs-engineer"
-				"technical-docs-artist:Docs Architect (Emerson):docs-architect"
-				"e6-problem-solver:Systems Thinker (Jan):systems-thinker"
+				"sentinel:Sentinel (Morgan):sentinel"
+				"conversion-architect:Conversion Architect (Avery):conversion-architect"
+				"docs-engineer:Docs Engineer (Sam):docs-engineer"
+				"docs-architect:Docs Architect (Emerson):docs-architect"
+				"systems-thinker:Systems Thinker (Jan):systems-thinker"
 			)
 
 			local -a SELECTED_AGENTS=()

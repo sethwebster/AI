@@ -13,7 +13,22 @@
       "Bash(git -C /Users/sethwebster/Development/AI add:*)",
       "Bash(git -C /Users/sethwebster/Development/AI log --oneline -5)",
       "Bash(ai)",
-      "Bash(ai help)"
+      "Bash(ai help)",
+      "Bash(bash:*)",
+      "Bash(git -C /Users/sethwebster/Development/AI commit -m \"fix: handle symlinked shell rc files in install\n\n- Resolve symlink to actual file before editing\n- Use temp file for sed to work with symlinks\n- Preserves file permissions\")",
+      "Bash(git -C /Users/sethwebster/Development/AI push)",
+      "Bash(portkill:*)",
+      "Bash(portfind)",
+      "Bash(git -C /Users/sethwebster/Development/AI commit -m \"feat: add portfind and portkill utilities\n\n- portfind: find processes by port \\(like pgrep\\)\n- portkill: kill processes by port \\(like pkill\\)\")",
+      "Bash(git revert:*)",
+      "Bash(ai install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint)",
+      "Bash(ai migrate:*)",
+      "Bash(ai unknown_command)",
+      "Bash(ai version:*)",
+      "Bash(npm install:*)",
+      "Bash(git mv:*)"
     ]
   }
 }

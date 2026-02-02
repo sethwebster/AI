@@ -113,7 +113,7 @@ After implementing a feature:
 ```typescript
 // Using the Task tool
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review auth implementation",
   prompt: "Review JWT authentication in src/auth/ for security issues and race conditions"
 }
@@ -123,7 +123,7 @@ After building UI:
 
 ```typescript
 {
-  subagent_type: "design-visionary",
+  subagent_type: "conversion-architect",
   description: "Review landing page",
   prompt: "Review the landing page design for conversion optimization and mobile UX"
 }
@@ -133,7 +133,7 @@ For documentation:
 
 ```typescript
 {
-  subagent_type: "docs-artisan",
+  subagent_type: "docs-engineer",
   description: "Document API",
   prompt: "Create API documentation for the authentication endpoints including examples and error codes"
 }
@@ -161,7 +161,7 @@ Use **Sentinel (Morgan)** for code review:
 
 ```typescript
 {
-  subagent_type: "neckbeard-code-reviewer",
+  subagent_type: "sentinel",
   description: "Review auth system",
   prompt: "Review the authentication system for security vulnerabilities, race conditions, and architectural concerns"
 }
@@ -173,7 +173,7 @@ Use **Docs Engineer (Sam)** for clear docs:
 
 ```typescript
 {
-  subagent_type: "docs-artisan",
+  subagent_type: "docs-engineer",
   description: "Document auth API",
   prompt: "Create documentation for the authentication API including setup, endpoints, examples, and security considerations"
 }
@@ -185,7 +185,7 @@ For public-facing docs, use **Docs Architect (Emerson)**:
 
 ```typescript
 {
-  subagent_type: "technical-docs-artist",
+  subagent_type: "docs-architect",
   description: "Polish auth docs",
   prompt: "Elevate the authentication docs with beautiful formatting, narrative flow, and visual hierarchy"
 }
