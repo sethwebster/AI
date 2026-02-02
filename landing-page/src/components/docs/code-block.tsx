@@ -24,8 +24,14 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
         });
         setHtml(highlighted);
       } catch (error) {
-        // Fallback to plain text if language not supported
-        setHtml(`<pre><code>${children}</code></pre>`);
+        // Fallback to plain text if language not supported or invalid syntax
+        const escaped = children
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+        setHtml(`<pre class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 overflow-x-auto"><code class="text-zinc-100">${escaped}</code></pre>`);
       }
     }
     highlight();
