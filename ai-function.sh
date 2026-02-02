@@ -1,4 +1,6 @@
 # AI Development CLI
+AI_VERSION="1.0.0"
+
 ai() {
 	local cmd="$1"
 	shift
@@ -282,6 +284,11 @@ EOF
 			echo "✅ Removed $CURRENT_DIR from registry"
 			;;
 
+		version|--version|-v)
+			echo "AI Development CLI v${AI_VERSION}"
+			echo "Source: https://github.com/sethwebster/AI"
+			;;
+
 		install)
 			local target="$1"
 
@@ -504,15 +511,16 @@ EOF
 			;;
 
 		*)
-			echo "AI Development Best Practices CLI"
+			echo "AI Development Best Practices CLI v${AI_VERSION}"
 			echo ""
 			echo "Usage:"
 			echo "  ai init           - Initialize directory with AI dev best practices"
-			echo "  ai install agents - Install agent definitions"
+			echo "  ai install agents - Install agent definitions into Claude/Codex"
 			echo "  ai update         - Update local repo and ai function"
 			echo "  ai update-all     - Update all registered directories"
 			echo "  ai list           - List registered directories"
 			echo "  ai forget         - Remove current directory from registry"
+			echo "  ai version        - Show version information"
 			echo ""
 			echo "Source: https://github.com/sethwebster/AI"
 			return 1
