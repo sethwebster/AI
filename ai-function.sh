@@ -142,6 +142,20 @@ EOF
 			echo "   cat AGENTS.md"
 			echo "   cat AGENT-WORKSPACE.md"
 			echo ""
+
+			# Prompt to install agents
+			echo "🤖 Would you like to install agent definitions?"
+			printf "Install agents? (Y/n) "
+			read -r INSTALL_AGENTS < /dev/tty
+			echo ""
+
+			if [[ ! "$INSTALL_AGENTS" =~ ^[Nn]$ ]]; then
+				ai install agents
+			else
+				echo "ℹ️  You can install agents later with: ai install agents"
+			fi
+
+			echo ""
 			echo "🔗 Source: https://github.com/sethwebster/AI"
 			;;
 
@@ -284,15 +298,136 @@ EOF
 			echo "✅ Removed $CURRENT_DIR from registry"
 			;;
 
+		install)
+			local target="$1"
+
+			if [ "$target" != "agents" ]; then
+				echo "❌ Unknown install target: $target"
+				echo "   Available: agents"
+				return 1
+			fi
+
+			local REPO_CLONE="$HOME/.ai-repo-local-clone"
+
+			if [ ! -d "$REPO_CLONE" ]; then
+				echo "❌ Local repo not found"
+				echo "   Run 'ai init' first"
+				return 1
+			fi
+
+			if [ ! -d "$REPO_CLONE/agents" ]; then
+				echo "❌ Agents not found in local repo"
+				return 1
+			fi
+
+			echo "🤖 Agent Installation"
+			echo ""
+			echo "Select agents to install (space-separated numbers or 'all'):"
+			echo ""
+			echo "  0. All agents"
+			echo "  1. Sentinel (Morgan) - Code review & architecture"
+			echo "  2. Conversion Architect (Avery) - Design & UX"
+			echo "  3. Docs Engineer (Sam) - Functional documentation"
+			echo "  4. Docs Architect (Emerson) - Award-worthy docs"
+			echo "  5. Systems Thinker (Jan) - Complex problem solving"
+			echo ""
+			printf "Selection: "
+			read -r SELECTION < /dev/tty
+			echo ""
+
+			# Create agents directory
+			mkdir -p agents
+
+			# Define agents
+			local -a AGENT_FILES=(
+				"neckbeard-code-reviewer.md:Sentinel (Morgan)"
+				"design-visionary.md:Conversion Architect (Avery)"
+				"docs-artisan.md:Docs Engineer (Sam)"
+				"technical-docs-artist.md:Docs Architect (Emerson)"
+				"e6-problem-solver.md:Systems Thinker (Jan)"
+			)
+
+			local INSTALLED=0
+
+			# Handle "all" or "0"
+			if [[ "$SELECTION" == "all" ]] || [[ "$SELECTION" =~ (^|[[:space:]])0([[:space:]]|$) ]]; then
+				echo "📦 Installing all agents..."
+				echo ""
+				for agent_info in "${AGENT_FILES[@]}"; do
+					local file="${agent_info%%:*}"
+					local name="${agent_info##*:}"
+					cp "$REPO_CLONE/agents/$file" "agents/$file"
+					echo "  ✅ $name"
+					((INSTALLED++))
+				done
+				# Also copy README
+				cp "$REPO_CLONE/agents/README.md" "agents/README.md"
+				echo "  ✅ README"
+			else
+				# Handle individual selections
+				for num in $SELECTION; do
+					case $num in
+						1)
+							cp "$REPO_CLONE/agents/neckbeard-code-reviewer.md" "agents/"
+							echo "  ✅ Sentinel (Morgan)"
+							((INSTALLED++))
+							;;
+						2)
+							cp "$REPO_CLONE/agents/design-visionary.md" "agents/"
+							echo "  ✅ Conversion Architect (Avery)"
+							((INSTALLED++))
+							;;
+						3)
+							cp "$REPO_CLONE/agents/docs-artisan.md" "agents/"
+							echo "  ✅ Docs Engineer (Sam)"
+							((INSTALLED++))
+							;;
+						4)
+							cp "$REPO_CLONE/agents/technical-docs-artist.md" "agents/"
+							echo "  ✅ Docs Architect (Emerson)"
+							((INSTALLED++))
+							;;
+						5)
+							cp "$REPO_CLONE/agents/e6-problem-solver.md" "agents/"
+							echo "  ✅ Systems Thinker (Jan)"
+							((INSTALLED++))
+							;;
+						*)
+							if [ "$num" != "0" ]; then
+								echo "  ⚠️  Invalid selection: $num"
+							fi
+							;;
+					esac
+				done
+
+				# Copy README if any agents were installed
+				if [ $INSTALLED -gt 0 ]; then
+					cp "$REPO_CLONE/agents/README.md" "agents/README.md"
+					echo "  ✅ README"
+				fi
+			fi
+
+			echo ""
+			if [ $INSTALLED -gt 0 ]; then
+				echo "✅ Installed $INSTALLED agent(s) to ./agents/"
+				echo ""
+				echo "📖 Learn more: cat agents/README.md"
+			else
+				echo "❌ No agents installed"
+				return 1
+			fi
+			;;
+
 		*)
 			echo "AI Development Best Practices CLI"
 			echo ""
 			echo "Usage:"
-			echo "  ai init        - Initialize directory with AI dev best practices"
-			echo "  ai update      - Update local repo and ai function"
-			echo "  ai update-all  - Update all registered directories"
-			echo "  ai list        - List registered directories"
-			echo "  ai forget      - Remove current directory from registry"
+			echo "  ai init           - Initialize directory with AI dev best practices"
+			echo "  ai install agents - Install agent definitions"
+			echo "  ai update         - Update local repo and ai function"
+			echo "  ai update-all     - Update all registered directories"
+			echo "  ai list           - List registered directories"
+			echo "  ai forget         - Remove current directory from registry"
 			echo ""
 			echo "Source: https://github.com/sethwebster/AI"
 			return 1
