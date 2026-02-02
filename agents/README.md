@@ -4,10 +4,10 @@ This directory contains definitions and usage guides for specialized Claude Code
 
 ## Available Agents
 
-### [Neckbeard Code Reviewer](./neckbeard-code-reviewer.md)
+### [Sentinel](./neckbeard-code-reviewer.md) (Morgan)
 **Type:** `neckbeard-code-reviewer`
 
-Rigorous, uncompromising code review focused on security, maintainability, DRY principles, and architectural elegance. Deploy after completing code chunks, features, or refactors.
+Uber Tech Lead & system steward providing senior oversight across code, architecture, and design; flags long-term risks, enforces engineering values, and intervenes when decisions threaten system coherence.
 
 **Best for:**
 - Security vulnerability detection
@@ -17,10 +17,10 @@ Rigorous, uncompromising code review focused on security, maintainability, DRY p
 
 ---
 
-### [Design Visionary](./design-visionary.md)
+### [Conversion Architect](./design-visionary.md) (Avery)
 **Type:** `design-visionary`
 
-Creates emotionally resonant, conversion-optimized designs that balance cutting-edge trends with tasteful execution.
+Conversion-optimized design strategist focused on user behavior, growth leverage, UX clarity, and commercially effective design decisions.
 
 **Best for:**
 - Landing pages
@@ -31,10 +31,10 @@ Creates emotionally resonant, conversion-optimized designs that balance cutting-
 
 ---
 
-### [Docs Artisan](./docs-artisan.md)
+### [Docs Engineer](./docs-artisan.md) (Sam)
 **Type:** `docs-artisan`
 
-Creates, updates, and improves documentation for features, APIs, components, and systems. Use proactively after implementing new features.
+Implementation-grade documentation focused on accuracy, clarity, completeness, and developer usability; eliminates ambiguity and ensures docs are shippable.
 
 **Best for:**
 - API documentation
@@ -45,10 +45,10 @@ Creates, updates, and improves documentation for features, APIs, components, and
 
 ---
 
-### [Technical Docs Artist](./technical-docs-artist.md)
+### [Docs Architect](./technical-docs-artist.md) (Emerson)
 **Type:** `technical-docs-artist`
 
-Creates award-worthy technical documentation with exceptional presentation while maintaining technical precision. Elevates documentation beyond functional to beautiful.
+High-polish, narrative-driven technical documentation with strong structure, voice, and presentation quality suitable for public, award-level docs.
 
 **Best for:**
 - Standout API docs
@@ -59,10 +59,10 @@ Creates award-worthy technical documentation with exceptional presentation while
 
 ---
 
-### [E6 Problem Solver](./e6-problem-solver.md)
+### [Systems Thinker](./e6-problem-solver.md) (Jan)
 **Type:** `e6-problem-solver`
 
-Senior staff engineer-level collaborative problem-solving for complex, ambiguous architectural challenges.
+Deep, multi-layer systems problem solver that reasons across constraints, abstractions, and edge cases to arrive at durable, principled solutions.
 
 **Best for:**
 - Architectural decisions
@@ -87,13 +87,13 @@ Senior staff engineer-level collaborative problem-solving for complex, ambiguous
 
 ### Quick Reference
 
-| Agent | When to Use | Key Strength |
-|-------|------------|--------------|
-| neckbeard-code-reviewer | After implementation | Security & architecture |
-| design-visionary | UI/UX design needed | Conversion & emotion |
-| docs-artisan | Documentation needed | Clear, functional docs |
-| technical-docs-artist | Standout docs needed | Beautiful presentation |
-| e6-problem-solver | Complex problems | Collaborative analysis |
+| Agent | Persona | When to Use | Key Strength |
+|-------|---------|------------|--------------|
+| Sentinel | Morgan | After implementation | Security & architecture |
+| Conversion Architect | Avery | UI/UX design needed | Conversion & growth |
+| Docs Engineer | Sam | Documentation needed | Clear, functional docs |
+| Docs Architect | Emerson | Standout docs needed | Beautiful presentation |
+| Systems Thinker | Jan | Complex problems | Multi-layer analysis |
 
 ## Best Practices
 
@@ -160,31 +160,31 @@ Senior staff engineer-level collaborative problem-solving for complex, ambiguous
 
 ### Documentation Agents
 
-**docs-artisan vs technical-docs-artist**
+**Docs Engineer (Sam) vs Docs Architect (Emerson)**
 
-| Aspect | docs-artisan | technical-docs-artist |
-|--------|--------------|----------------------|
+| Aspect | Docs Engineer | Docs Architect |
+|--------|--------------|----------------|
 | Style | Professional, clear | Creative, beautiful |
 | Use Case | Standard docs | Standout docs |
 | Focus | Functionality | Presentation + functionality |
 
 **When to use each:**
-- Standard API docs, guides, READMEs → **docs-artisan**
-- Marketing/public docs, flagship projects → **technical-docs-artist**
+- Standard API docs, guides, READMEs → **Docs Engineer (Sam)**
+- Marketing/public docs, flagship projects → **Docs Architect (Emerson)**
 
 ### Problem-Solving Agents
 
-**General vs e6-problem-solver**
+**General vs Systems Thinker (Jan)**
 
-| Aspect | General Agent | e6-problem-solver |
-|--------|--------------|-------------------|
+| Aspect | General Agent | Systems Thinker |
+|--------|--------------|-----------------|
 | Complexity | Simple to moderate | Complex, ambiguous |
-| Approach | Direct implementation | Collaborative analysis |
+| Approach | Direct implementation | Multi-layer analysis |
 | Use Case | Clear requirements | Unclear/multiple approaches |
 
 **When to use each:**
 - Well-defined tasks → **general agent**
-- Architectural decisions, complex problems → **e6-problem-solver**
+- Architectural decisions, complex problems → **Systems Thinker (Jan)**
 
 ## Contributing
 
