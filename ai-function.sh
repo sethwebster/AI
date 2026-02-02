@@ -35,8 +35,8 @@ ai() {
 	# Agent colors (from agents.tsx)
 	local RED="\033[38;5;203m"        # Red-500 - Sentinel
 	local ORANGE="\033[38;5;208m"     # Orange-500 - Sentinel gradient
-	local PURPLE="\033[38;5;135m"     # Purple-500 - Conversion Architect
-	local PINK="\033[38;5;205m"       # Pink-500 - Conversion gradient
+	local PURPLE="\033[38;5;135m"     # Purple-500 - Product/UX Designer
+	local PINK="\033[38;5;205m"       # Pink-500 - Product/UX gradient
 	local EMERALD="\033[38;5;48m"     # Emerald-500 - Docs Architect
 	local TEAL="\033[38;5;44m"        # Teal-500 - Docs Architect gradient
 	local AMBER="\033[38;5;214m"      # Amber-500 - Systems Thinker
@@ -778,7 +778,7 @@ ai() {
 			echo ""
 
 			_ai_agent_card "1" "Sentinel" "Morgan" "$RED" "Code review, security analysis, architecture oversight"
-			_ai_agent_card "2" "Conversion Architect" "Avery" "$PURPLE" "UX & growth design, Apple HIG expertise"
+			_ai_agent_card "2" "Product/UX Designer" "Avery" "$PURPLE" "User-centered design, interface excellence"
 			_ai_agent_card "3" "Docs Engineer" "Sam" "$CYAN" "Clear, accurate, shippable documentation"
 			_ai_agent_card "4" "Docs Architect" "Emerson" "$EMERALD" "Narrative-driven, award-worthy docs"
 			_ai_agent_card "5" "Systems Thinker" "Jan" "$AMBER" "Deep problem solving, first-principles"
@@ -791,7 +791,7 @@ ai() {
 
 			local -a AGENTS=(
 				"sentinel:Sentinel (Morgan):sentinel"
-				"product-ux-designer:Conversion Architect (Avery):product-ux-designer"
+				"product-ux-designer:Product/UX Designer (Avery):product-ux-designer"
 				"docs-engineer:Docs Engineer (Sam):docs-engineer"
 				"docs-architect:Docs Architect (Emerson):docs-architect"
 				"systems-thinker:Systems Thinker (Jan):systems-thinker"
