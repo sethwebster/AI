@@ -28,12 +28,28 @@ body {
 /* MDX Code Syntax Highlighting */
 pre {
   overflow-x: auto;
+  background-color: rgb(24 24 27) !important;
+  border: 1px solid rgb(39 39 42);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
 }
 
 pre > code {
   display: block;
   font-size: 0.875rem;
   line-height: 1.7;
+  color: rgb(228 228 231);
+}
+
+/* Inline code */
+:not(pre) > code {
+  background-color: rgb(39 39 42);
+  color: rgb(228 228 231);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-weight: 500;
 }
 
 code[data-line-numbers] {
@@ -69,6 +85,15 @@ code[data-line-numbers-max-digits="3"] > [data-line]::before {
   background-color: rgba(34, 211, 238, 0.2);
   border-radius: 0.25rem;
   padding: 0.125rem 0.25rem;
+}
+
+/* Syntax highlighting token colors */
+code .line {
+  color: rgb(228 228 231);
+}
+
+code [data-theme="dark"] {
+  color: rgb(228 228 231);
 }
 
 /* Anchor links */

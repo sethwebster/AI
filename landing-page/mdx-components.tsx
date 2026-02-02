@@ -54,13 +54,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         );
       }
       return (
-        <code className={className}>
+        <code className={`${className} text-zinc-100`}>
           {children}
         </code>
       );
     },
     pre: ({ children }: { children?: React.ReactNode }) => (
-      <pre className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 overflow-x-auto mb-6 text-sm">
+      <pre className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 overflow-x-auto mb-6 text-sm text-zinc-100">
         {children}
       </pre>
     ),
