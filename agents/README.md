@@ -73,6 +73,51 @@ Deep, multi-layer systems problem solver that reasons across constraints, abstra
 
 ---
 
+### [Compiler Expert](./compiler-expert.md) (Kai)
+**Type:** `compiler-expert`
+
+Deep compiler and language implementation specialist with expertise in parsing, optimization, code generation, and runtime systems.
+
+**Best for:**
+- Compiler/interpreter implementation
+- Parser design
+- Type systems
+- Code optimization
+- AST transformations
+- Static analysis
+
+---
+
+### [Systems Engineer](./systems-engineer.md) (Riley)
+**Type:** `systems-engineer`
+
+Infrastructure and distributed systems specialist focused on scalability, reliability, observability, and operational excellence at scale.
+
+**Best for:**
+- Kubernetes/Docker orchestration
+- CI/CD pipelines
+- Monitoring and observability
+- Database scaling
+- Infrastructure as Code
+- Production incidents
+
+---
+
+### [Hardware Engineer](./hardware-engineer.md) (Quinn)
+**Type:** `hardware-engineer`
+
+Hardware and embedded systems specialist with expertise in circuit design, firmware development, hardware-software interfaces, and low-level optimization.
+
+**Best for:**
+- Firmware development
+- Circuit design
+- IoT devices
+- Embedded systems
+- Communication protocols (I2C, SPI, UART)
+- Hardware debugging
+
+---
+
 ## How to Use
 
 ### Basic Invocation
@@ -94,6 +139,9 @@ Deep, multi-layer systems problem solver that reasons across constraints, abstra
 | Docs Engineer | Sam | Documentation needed | Clear, functional docs |
 | Docs Architect | Emerson | Standout docs needed | Beautiful presentation |
 | Systems Thinker | Jan | Complex problems | Multi-layer analysis |
+| Compiler Expert | Kai | Compiler/language work | Parsing & optimization |
+| Systems Engineer | Riley | Infrastructure/ops | Scalability & reliability |
+| Hardware Engineer | Quinn | Embedded/IoT | Firmware & circuits |
 
 ## Best Practices
 

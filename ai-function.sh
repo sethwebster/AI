@@ -795,6 +795,9 @@ ai() {
 				"docs-engineer:Docs Engineer (Sam):docs-engineer"
 				"docs-architect:Docs Architect (Emerson):docs-architect"
 				"systems-thinker:Systems Thinker (Jan):systems-thinker"
+			"compiler-expert:Compiler Expert (Kai):compiler-expert"
+			"systems-engineer:Systems Engineer (Riley):systems-engineer"
+			"hardware-engineer:Hardware Engineer (Quinn):hardware-engineer"
 			)
 
 			local -a SELECTED_AGENTS=()
