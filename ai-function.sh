@@ -131,19 +131,8 @@ EOF
 			echo "   cat AGENTS.md"
 			echo "   cat AGENT-WORKSPACE.md"
 			echo ""
-
-			# Prompt to install agents
-			echo "🤖 Would you like to install agent definitions?"
-			printf "Install agents? (Y/n) "
-			read -r INSTALL_AGENTS < /dev/tty
-			echo ""
-
-			if [[ ! "$INSTALL_AGENTS" =~ ^[Nn]$ ]]; then
-				ai install agents
-			else
-				echo "ℹ️  You can install agents later with: ai install agents"
-			fi
-
+			echo "🤖 Available agents:"
+			echo "   cat $REPO_CLONE/agents/README.md"
 			echo ""
 			echo "🔗 Source: https://github.com/sethwebster/AI"
 			;;
@@ -301,113 +290,155 @@ EOF
 
 			local REPO_CLONE="$HOME/.ai-repo-local-clone"
 
-			if [ ! -d "$REPO_CLONE" ]; then
-				echo "❌ Local repo not found"
-				echo "   Run 'ai init' first"
-				return 1
-			fi
-
 			if [ ! -d "$REPO_CLONE/agents" ]; then
 				echo "❌ Agents not found in local repo"
+				echo "   Run 'ai init' first"
 				return 1
 			fi
 
 			echo "🤖 Agent Installation"
 			echo ""
-			echo "Select agents to install (space-separated numbers or 'all'):"
+			echo "Detecting AI coding tools..."
 			echo ""
-			echo "  0. All agents"
-			echo "  1. Sentinel (Morgan) - Code review & architecture"
-			echo "  2. Conversion Architect (Avery) - Design & UX"
-			echo "  3. Docs Engineer (Sam) - Functional documentation"
-			echo "  4. Docs Architect (Emerson) - Award-worthy docs"
-			echo "  5. Systems Thinker (Jan) - Complex problem solving"
+
+			local DETECTED_TOOLS=()
+
+			# Detect Claude Code
+			if command -v claude &> /dev/null || [ -d "$HOME/.claude" ]; then
+				DETECTED_TOOLS+=("claude")
+				echo "  ✅ Claude Code detected"
+			fi
+
+			# Detect Codex (placeholder - need to verify detection method)
+			if command -v codex &> /dev/null || [ -d "$HOME/.codex" ]; then
+				DETECTED_TOOLS+=("codex")
+				echo "  ✅ Codex detected"
+			fi
+
+			if [ ${#DETECTED_TOOLS[@]} -eq 0 ]; then
+				echo "  ⚠️  No AI coding tools detected"
+				echo ""
+				echo "Supported tools:"
+				echo "  - Claude Code (https://claude.com/claude-code)"
+				echo "  - Codex"
+				return 1
+			fi
+
 			echo ""
-			printf "Selection: "
+			echo "Available agents in $REPO_CLONE/agents:"
+			echo ""
+			echo "  1. Sentinel (Morgan) - neckbeard-code-reviewer"
+			echo "  2. Conversion Architect (Avery) - design-visionary"
+			echo "  3. Docs Engineer (Sam) - docs-artisan"
+			echo "  4. Docs Architect (Emerson) - technical-docs-artist"
+			echo "  5. Systems Thinker (Jan) - e6-problem-solver"
+			echo ""
+			printf "Select agents (space-separated numbers or 'all'): "
 			read -r SELECTION < /dev/tty
 			echo ""
 
-			# Create agents directory
-			mkdir -p agents
-
 			# Define agents
-			local -a AGENT_FILES=(
-				"neckbeard-code-reviewer.md:Sentinel (Morgan)"
-				"design-visionary.md:Conversion Architect (Avery)"
-				"docs-artisan.md:Docs Engineer (Sam)"
-				"technical-docs-artist.md:Docs Architect (Emerson)"
-				"e6-problem-solver.md:Systems Thinker (Jan)"
+			local -a AGENTS=(
+				"neckbeard-code-reviewer:Sentinel (Morgan)"
+				"design-visionary:Conversion Architect (Avery)"
+				"docs-artisan:Docs Engineer (Sam)"
+				"technical-docs-artist:Docs Architect (Emerson)"
+				"e6-problem-solver:Systems Thinker (Jan)"
 			)
 
-			local INSTALLED=0
+			local -a SELECTED_AGENTS=()
 
-			# Handle "all" or "0"
-			if [[ "$SELECTION" == "all" ]] || [[ "$SELECTION" =~ (^|[[:space:]])0([[:space:]]|$) ]]; then
-				echo "📦 Installing all agents..."
-				echo ""
-				for agent_info in "${AGENT_FILES[@]}"; do
-					local file="${agent_info%%:*}"
-					local name="${agent_info##*:}"
-					cp "$REPO_CLONE/agents/$file" "agents/$file"
-					echo "  ✅ $name"
-					((INSTALLED++))
-				done
-				# Also copy README
-				cp "$REPO_CLONE/agents/README.md" "agents/README.md"
-				echo "  ✅ README"
+			# Parse selection
+			if [[ "$SELECTION" == "all" ]]; then
+				SELECTED_AGENTS=("${AGENTS[@]}")
 			else
-				# Handle individual selections
 				for num in $SELECTION; do
 					case $num in
-						1)
-							cp "$REPO_CLONE/agents/neckbeard-code-reviewer.md" "agents/"
-							echo "  ✅ Sentinel (Morgan)"
-							((INSTALLED++))
-							;;
-						2)
-							cp "$REPO_CLONE/agents/design-visionary.md" "agents/"
-							echo "  ✅ Conversion Architect (Avery)"
-							((INSTALLED++))
-							;;
-						3)
-							cp "$REPO_CLONE/agents/docs-artisan.md" "agents/"
-							echo "  ✅ Docs Engineer (Sam)"
-							((INSTALLED++))
-							;;
-						4)
-							cp "$REPO_CLONE/agents/technical-docs-artist.md" "agents/"
-							echo "  ✅ Docs Architect (Emerson)"
-							((INSTALLED++))
-							;;
-						5)
-							cp "$REPO_CLONE/agents/e6-problem-solver.md" "agents/"
-							echo "  ✅ Systems Thinker (Jan)"
-							((INSTALLED++))
-							;;
-						*)
-							if [ "$num" != "0" ]; then
-								echo "  ⚠️  Invalid selection: $num"
-							fi
-							;;
+						1) SELECTED_AGENTS+=("${AGENTS[0]}") ;;
+						2) SELECTED_AGENTS+=("${AGENTS[1]}") ;;
+						3) SELECTED_AGENTS+=("${AGENTS[2]}") ;;
+						4) SELECTED_AGENTS+=("${AGENTS[3]}") ;;
+						5) SELECTED_AGENTS+=("${AGENTS[4]}") ;;
+						*) echo "  ⚠️  Invalid selection: $num" ;;
 					esac
 				done
-
-				# Copy README if any agents were installed
-				if [ $INSTALLED -gt 0 ]; then
-					cp "$REPO_CLONE/agents/README.md" "agents/README.md"
-					echo "  ✅ README"
-				fi
 			fi
 
-			echo ""
-			if [ $INSTALLED -gt 0 ]; then
-				echo "✅ Installed $INSTALLED agent(s) to ./agents/"
-				echo ""
-				echo "📖 Learn more: cat agents/README.md"
-			else
-				echo "❌ No agents installed"
+			if [ ${#SELECTED_AGENTS[@]} -eq 0 ]; then
+				echo "❌ No agents selected"
 				return 1
 			fi
+
+			echo "Installing agents for detected tools..."
+			echo ""
+
+			# Install for each detected tool
+			for tool in "${DETECTED_TOOLS[@]}"; do
+				case "$tool" in
+					claude)
+						echo "📦 Installing for Claude Code..."
+						echo ""
+						echo "Choose installation location:"
+						echo "  1. Project-level (.claude/agents/) - Team sharing"
+						echo "  2. User-level (~/.claude/agents/) - Personal only"
+						printf "Selection (1/2): "
+						read -r LOCATION < /dev/tty
+						echo ""
+
+						local AGENT_DIR
+						if [ "$LOCATION" = "1" ]; then
+							AGENT_DIR=".claude/agents"
+							echo "Installing to .claude/agents/ (project-level)..."
+						else
+							AGENT_DIR="$HOME/.claude/agents"
+							echo "Installing to ~/.claude/agents/ (user-level)..."
+						fi
+
+						mkdir -p "$AGENT_DIR"
+
+						# Install selected agents
+						for agent_info in "${SELECTED_AGENTS[@]}"; do
+							local agent_type="${agent_info%%:*}"
+							local agent_name="${agent_info##*:}"
+							local source_file="$REPO_CLONE/agents/${agent_type}.md"
+							local dest_file="$AGENT_DIR/${agent_type}.md"
+
+							if [ -f "$source_file" ]; then
+								# Extract frontmatter from source
+								local description=$(grep -A 1 "^## Role" "$source_file" | tail -1)
+
+								# Create Claude agent file with frontmatter
+								cat > "$dest_file" <<EOF
+---
+name: ${agent_type}
+description: ${description}
+tools: Read, Write, Edit, Glob, Grep, Bash, LSP
+model: sonnet
+---
+
+EOF
+								# Append the rest of the markdown (skip first 5 lines: title, blank, agent type, persona, blank)
+								tail -n +6 "$source_file" >> "$dest_file"
+
+								echo "  ✅ $agent_name"
+							else
+								echo "  ❌ $agent_name (source not found)"
+							fi
+						done
+						;;
+					codex)
+						echo "📦 Installing for Codex..."
+						echo "  ℹ️  Codex installation not yet implemented"
+						;;
+				esac
+			done
+
+			echo ""
+			echo "✅ Agent installation complete"
+			echo ""
+			echo "📖 Learn more: cat $REPO_CLONE/agents/README.md"
+			echo ""
+			echo "🔄 Restart Claude Code to load the new agents"
 			;;
 
 		*)
