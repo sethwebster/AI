@@ -299,3 +299,53 @@ EOF
 			;;
 	esac
 }
+
+# Port Find - Find process by port number
+portfind() {
+	if [ -z "$1" ]; then
+		echo "Usage: portfind <port>"
+		echo "Example: portfind 3000"
+		return 1
+	fi
+
+	local PORT="$1"
+
+	# Find processes using the port
+	local RESULTS=$(lsof -i :$PORT 2>/dev/null)
+
+	if [ -z "$RESULTS" ]; then
+		echo "No process found on port $PORT"
+		return 1
+	fi
+
+	echo "$RESULTS"
+}
+
+# Port Kill - Kill process by port number
+portkill() {
+	if [ -z "$1" ]; then
+		echo "Usage: portkill <port>"
+		echo "Example: portkill 3000"
+		return 1
+	fi
+
+	local PORT="$1"
+
+	# Find PIDs using the port
+	local PIDS=$(lsof -ti :$PORT 2>/dev/null)
+
+	if [ -z "$PIDS" ]; then
+		echo "No process found on port $PORT"
+		return 1
+	fi
+
+	echo "Killing process(es) on port $PORT..."
+	echo "$PIDS" | xargs kill -9 2>/dev/null
+
+	if [ $? -eq 0 ]; then
+		echo "✅ Process(es) killed: $PIDS"
+	else
+		echo "❌ Failed to kill process(es)"
+		return 1
+	fi
+}
