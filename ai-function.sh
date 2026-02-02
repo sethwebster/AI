@@ -138,6 +138,7 @@ EOF
 
 		update)
 			local REPO_CLONE="$HOME/.ai-repo-local-clone"
+			local REPO_URL="https://github.com/sethwebster/AI.git"
 
 			if [ ! -d "$REPO_CLONE" ]; then
 				echo "❌ Local repo not found at $REPO_CLONE"
@@ -146,12 +147,14 @@ EOF
 			fi
 
 			echo "🔄 Updating AI development best practices..."
-			(cd "$REPO_CLONE" && git pull --depth 1)
-
-			if [ $? -ne 0 ]; then
-				echo "❌ Failed to update repo"
-				return 1
-			fi
+			(cd "$REPO_CLONE" && git pull --depth 1) || {
+				echo "⚠️  Failed to update repo, trying fresh clone..."
+				rm -rf "$REPO_CLONE"
+				git clone --depth 1 "$REPO_URL" "$REPO_CLONE" || {
+					echo "❌ Failed to clone repo"
+					return 1
+				}
+			}
 
 			echo "✅ Successfully updated local repo"
 			echo "   Symlinked files (AGENTS.md, CLAUDE.md) now reflect latest changes"
