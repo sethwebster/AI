@@ -1,0 +1,369 @@
+# Sentinel (Morgan)
+
+Uber Tech Lead & system steward providing senior oversight across code, architecture, and design.
+
+## Overview
+
+**Agent Type:** `neckbeard-code-reviewer`
+**Persona:** Morgan
+**Expertise:** Security, architecture, code quality
+
+Sentinel is your rigorous, uncompromising code reviewer. Morgan flags long-term risks, enforces engineering values, and intervenes when decisions threaten system coherence.
+
+---
+
+## When to Deploy
+
+Use Sentinel after:
+
+- Completing logical code chunks
+- Major features
+- Refactors
+- System design decisions
+
+**Proactive usage:** Don't wait for bugs. Deploy Sentinel after every significant implementation to catch issues early.
+
+---
+
+## Expertise
+
+Sentinel excels at:
+
+- **Security vulnerability detection** - SQL injection, XSS, CSRF, auth issues
+- **Maintainability assessment** - Will you understand this in 6 months?
+- **DRY principle enforcement** - Eliminate duplication
+- **Architectural evaluation** - Does this fit the system design?
+- **Edge case identification** - What breaks when X happens?
+- **Race condition detection** - Concurrent access issues
+- **Separation of concerns** - Is business logic in the right place?
+
+---
+
+## Examples
+
+### Authentication Flow Review
+
+**Scenario:** Just implemented JWT authentication with refresh tokens.
+
+**Invocation:**
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review auth implementation",
+  prompt: "Review JWT authentication in src/auth/ for security vulnerabilities, race conditions, and architectural concerns. Focus on token refresh logic and session management."
+}
+```
+
+**What Sentinel checks:**
+
+- Token storage (not in localStorage for XSS protection)
+- Refresh token rotation
+- Token expiration handling
+- Race conditions in token refresh
+- SQL injection in user queries
+- Password hashing (bcrypt/Argon2, not MD5)
+- Session invalidation on logout
+
+---
+
+### Booking System Refactor
+
+**Scenario:** Moved booking logic from components to services.
+
+**Invocation:**
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review booking refactor",
+  prompt: "Evaluate the booking system refactor in src/bookings/. Check for separation of concerns, remaining coupling between components and services, and edge cases in cancellation flow."
+}
+```
+
+**What Sentinel checks:**
+
+- Components only handle UI, no business logic
+- Services are framework-agnostic
+- No circular dependencies
+- Race conditions in booking/cancellation
+- Edge cases: double-booking, concurrent cancellations
+- Error handling and rollback
+
+---
+
+### Caching Implementation
+
+**Scenario:** Added Redis caching to settings page.
+
+**Invocation:**
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review caching layer",
+  prompt: "Review caching implementation in src/settings/. Focus on cache invalidation, serialization issues (especially Dates), and race conditions when updating cached data."
+}
+```
+
+**What Sentinel checks:**
+
+- Cache invalidation strategy (explicit, not TTL-only)
+- Date serialization (ISO strings in cache, not Date objects)
+- Race conditions between read-cache and write-db
+- Cache key collisions
+- Error handling when cache is down
+- Layered caching (in-memory → Redis → DB)
+
+---
+
+### Database Query Optimization
+
+**Scenario:** Optimized slow dashboard query.
+
+**Invocation:**
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review query optimization",
+  prompt: "Review database query optimization in src/dashboard/stats.ts. Check for N+1 queries, proper indexing, and SQL injection vulnerabilities."
+}
+```
+
+**What Sentinel checks:**
+
+- N+1 query elimination (eager loading)
+- Proper use of indexes
+- Query complexity (avoid subqueries if joins work)
+- SQL injection protection (parameterized queries)
+- Unbounded queries (pagination required)
+- Database connection pooling
+
+---
+
+## How to Invoke
+
+### Basic Invocation
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Brief description (3-5 words)",
+  prompt: "Detailed prompt with context and focus areas"
+}
+```
+
+### Effective Prompts
+
+**Bad (too vague):**
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review code",
+  prompt: "Check my code for issues"
+}
+```
+
+**Good (specific and focused):**
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review payment integration",
+  prompt: "Review Stripe payment integration in src/payments/ for security vulnerabilities, error handling, and idempotency. Focus on webhook signature verification and race conditions in charge creation."
+}
+```
+
+---
+
+## What Sentinel Looks For
+
+### Security
+
+- **Authentication:** Secure password storage, session management
+- **Authorization:** Proper permission checks
+- **Injection:** SQL, XSS, CSRF protection
+- **Secrets:** API keys not hardcoded
+- **Crypto:** Using proven libraries, not rolling your own
+
+### Architecture
+
+- **Separation of concerns:** UI, business logic, data access
+- **Dependency direction:** Higher layers depend on lower
+- **Module boundaries:** Clear, documented interfaces
+- **Circular dependencies:** None allowed
+- **Framework coupling:** Domain logic is framework-agnostic
+
+### Code Quality
+
+- **DRY:** No unnecessary duplication
+- **Complexity:** Functions ≤50 lines, cyclomatic complexity ≤10
+- **Types:** Strong types, no `any`
+- **Error handling:** Explicit, typed errors
+- **Tests:** Critical paths covered
+
+### Edge Cases
+
+- **Null/undefined:** Handled explicitly
+- **Empty collections:** Doesn't assume non-empty
+- **Race conditions:** Concurrent access safe
+- **Boundary values:** Min/max values tested
+- **Error states:** Failure modes handled
+
+---
+
+## Sentinel's Philosophy
+
+### Fail Fast, Fail Loud
+
+Sentinel prefers:
+
+```typescript
+// ✓ Explicit failure
+if (!user) {
+  throw new NotFoundError('User not found')
+}
+
+// ✗ Silent failure
+if (!user) {
+  return  // What?
+}
+```
+
+### No Fallback Mechanisms
+
+Sentinel rejects:
+
+```typescript
+// ✗ Hides real failures
+try {
+  await sendEmail(user)
+} catch {
+  // Ignore email failures
+}
+
+// ✓ Handle failures explicitly
+try {
+  await sendEmail(user)
+} catch (error) {
+  logger.error('Email failed', { userId: user.id, error })
+  throw new EmailError('Failed to send welcome email')
+}
+```
+
+### Trust Nothing
+
+Sentinel enforces:
+
+```typescript
+// ✓ Validate at boundaries
+export async function createUser(req: Request) {
+  const input = validateCreateUserInput(await req.json())
+  // input is now trusted
+  return await userService.create(input)
+}
+
+// ✗ Assume valid input
+export async function createUser(req: Request) {
+  const input = await req.json()  // Untrusted!
+  return await userService.create(input)
+}
+```
+
+---
+
+## Common Feedback
+
+### Race Conditions
+
+```typescript
+// ✗ Race condition
+const count = await getCount()
+await setCount(count + 1)
+
+// ✓ Atomic operation
+await db.update(counter).set({
+  value: sql`${counter.value} + 1`
+})
+```
+
+### N+1 Queries
+
+```typescript
+// ✗ N+1 queries
+const posts = await db.select().from(posts)
+for (const post of posts) {
+  post.author = await db.query.users.findFirst({
+    where: eq(users.id, post.authorId)
+  })
+}
+
+// ✓ Eager loading
+const posts = await db
+  .select()
+  .from(posts)
+  .leftJoin(users, eq(users.id, posts.authorId))
+```
+
+### Weak Types
+
+```typescript
+// ✗ Weak types
+interface User {
+  id: string
+  role: string  // Any string!
+}
+
+// ✓ Strong types
+interface User {
+  id: UserId  // Branded type
+  role: 'admin' | 'user' | 'guest'  // Literal union
+}
+```
+
+---
+
+## Tools Available
+
+Sentinel has access to all standard tools:
+
+- Read
+- Write
+- Edit
+- Glob
+- Grep
+- Bash
+- LSP
+
+---
+
+## Workflow Integration
+
+### Typical Flow
+
+```
+1. Implement feature
+2. Self-review
+3. ai task → Sentinel review
+4. Fix issues
+5. Commit
+```
+
+### Continuous Review
+
+Don't batch reviews. Deploy Sentinel:
+
+- After each logical chunk (every 1-2 hours)
+- Before creating PR
+- After addressing PR feedback
+
+---
+
+## Next Steps
+
+- [Agents Overview](/docs/agents) - Compare all agents
+- [Conversion Architect](/docs/agents/conversion-architect) - UX and design
+- [Docs Engineer](/docs/agents/docs-engineer) - Clear documentation
+- [Best Practices](/docs/best-practices) - Write better code

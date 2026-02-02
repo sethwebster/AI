@@ -1,0 +1,377 @@
+# Configuration
+
+Customize AI Dev Tools for your workflow.
+
+## Project Configuration
+
+### AGENT-WORKSPACE.md
+
+This file lives in your project root and contains workspace-specific context.
+
+```markdown
+# Agent Workspace
+
+**READ THIS FILE FIRST, THEN READ AGENTS.md FOR UNIVERSAL GUIDELINES.**
+
+## Project Overview
+
+Brief description of what this project does.
+
+## Current Work
+
+What we're working on right now:
+- Feature X
+- Bug fix Y
+- Refactor Z
+
+## Development Commands
+
+\`\`\`bash
+npm install    # Install dependencies
+npm run dev    # Start dev server
+npm test       # Run tests
+npm run build  # Production build
+\`\`\`
+
+## Architecture Notes
+
+Key architectural decisions or patterns specific to this project.
+
+## Gotchas
+
+Things to watch out for in this codebase.
+```
+
+**Customize this file** - It's copied (not symlinked) during `ai init` for you to edit.
+
+---
+
+## Shell Configuration
+
+The `ai` function is added to your shell config:
+
+### Location
+
+- **Zsh:** `~/.zshrc`
+- **Bash:** `~/.bashrc`
+
+### Structure
+
+```bash
+# AI Development CLI
+AI_VERSION="1.1.0"
+
+ai() {
+  # ... function implementation ...
+}
+```
+
+### Customization
+
+The function uses environment detection:
+
+```bash
+# Auto-detects shell
+local SHELL_NAME=$(basename "$SHELL")
+
+# Auto-detects terminal color support
+if [[ ! -t 1 ]] || [[ "$TERM" == "dumb" ]]; then
+  USE_COLOR=false
+fi
+```
+
+---
+
+## Agent Installation
+
+### Claude Code
+
+Agents install to:
+
+```bash
+# Project-level (shared with team)
+.claude/agents/
+
+# User-level (personal only)
+~/.claude/agents/
+```
+
+**Frontmatter format:**
+
+```yaml
+---
+name: sentinel
+description: Code review, security analysis, architecture oversight
+tools: Read, Write, Edit, Glob, Grep, Bash, LSP
+model: sonnet
+---
+```
+
+### Codex
+
+Skills install to:
+
+```bash
+# Project-scoped
+.codex/skills/
+
+# User-scoped
+~/.codex/skills/ or $CODEX_HOME/skills/
+```
+
+**Directory structure:**
+
+```
+.codex/skills/
+└── sentinel/
+    └── SKILL.md
+```
+
+**Frontmatter format:**
+
+```yaml
+---
+name: sentinel
+description: Code review, security analysis, architecture oversight
+---
+```
+
+---
+
+## Registry
+
+The registry tracks initialized directories.
+
+### Location
+
+```bash
+~/.ai-registry
+```
+
+### Format
+
+Plain text, one path per line:
+
+```
+/Users/you/project-a
+/Users/you/project-b
+/Users/you/project-c
+```
+
+### Management
+
+```bash
+# Add (automatic during ai init)
+ai init
+
+# View
+ai list
+
+# Remove
+ai forget
+```
+
+---
+
+## Migration State
+
+Applied migrations are tracked for each user.
+
+### Location
+
+```bash
+~/.ai-migration-state
+```
+
+### Format
+
+Plain text, one migration ID per line:
+
+```
+001_rename_agents_to_personas
+002_update_frontmatter_format
+```
+
+### Commands
+
+```bash
+# Check status
+ai migrate status
+
+# Apply pending
+ai migrate up
+
+# Rollback last
+ai migrate down
+```
+
+---
+
+## Color Scheme
+
+The CLI uses a color system matching the landing page:
+
+### Primary Colors
+
+| Color | Usage | ANSI Code |
+|-------|-------|-----------|
+| Cyan-400 | Primary accent | `\033[38;5;51m` |
+| Blue-500 | Secondary accent | `\033[38;5;33m` |
+| Green-400 | Success | `\033[38;5;84m` |
+| White | Primary text | `\033[38;5;255m` |
+| Zinc-400 | Secondary text | `\033[38;5;245m` |
+
+### Agent Colors
+
+| Agent | Color | ANSI Code |
+|-------|-------|-----------|
+| Sentinel | Red-500 | `\033[38;5;203m` |
+| Conversion Architect | Purple-500 | `\033[38;5;135m` |
+| Docs Engineer | Cyan-500 | `\033[38;5;51m` |
+| Docs Architect | Emerald-500 | `\033[38;5;48m` |
+| Systems Thinker | Amber-500 | `\033[38;5;214m` |
+
+Colors automatically disable on non-TTY or dumb terminals.
+
+---
+
+## Environment Variables
+
+### CODEX_HOME
+
+Override Codex skills directory:
+
+```bash
+export CODEX_HOME="$HOME/.custom-codex"
+ai install agents
+```
+
+Default: `$HOME/.codex`
+
+---
+
+## Customizing Agents
+
+### Modify Installed Agents
+
+After installation, you can customize agent files:
+
+**Project-level (recommended for team customization):**
+
+```bash
+# Edit project-specific agent
+code .claude/agents/sentinel.md
+```
+
+**User-level (personal preferences):**
+
+```bash
+# Edit user-level agent
+code ~/.claude/agents/sentinel.md
+```
+
+**Warning:** Changes are lost on `ai update` for symlinked files (AGENTS.md, CLAUDE.md). Only customize the installed agent definitions in `.claude/agents/` or `~/.claude/agents/`.
+
+### Create Custom Agents
+
+Add your own agents to the project or user directory:
+
+```bash
+# Create custom agent
+cat > .claude/agents/my-custom-agent.md <<'EOF'
+---
+name: my-custom-agent
+description: Custom agent for specific task
+tools: Read, Write, Edit
+model: sonnet
+---
+
+# My Custom Agent
+
+Custom behavior and expertise...
+EOF
+```
+
+---
+
+## Git Integration
+
+### What to Commit
+
+**Do commit:**
+
+- ✓ `AGENT-WORKSPACE.md` (project-specific context)
+- ✓ `.claude/agents/*` (shared team agents, if project-level)
+- ✓ `.codex/skills/*` (shared team skills, if project-scoped)
+
+**Don't commit:**
+
+- ✗ `AGENTS.md` (symlink to user's local cache)
+- ✗ `CLAUDE.md` (symlink to user's local cache)
+
+### .gitignore
+
+Not needed! Symlinks commit as symlinks, but each dev's local cache resolves them.
+
+---
+
+## Workflow Preferences
+
+### Auto-update on cd
+
+Add to your shell config:
+
+```bash
+# Auto-update AI Dev Tools when entering a project
+auto_ai_update() {
+  if [ -f "AGENTS.md" ] && [ -L "AGENTS.md" ]; then
+    ai update --quiet
+  fi
+}
+
+# Zsh
+add-zsh-hook chpwd auto_ai_update
+
+# Bash
+PROMPT_COMMAND="auto_ai_update; $PROMPT_COMMAND"
+```
+
+**Warning:** This runs `ai update` on every directory change. May be slow.
+
+---
+
+## Advanced Configuration
+
+### Custom Migration Directory
+
+Migrations live in the repo, not configurable per-user:
+
+```bash
+~/.ai-repo-local-clone/migrations/
+```
+
+### Custom Agent Sources
+
+To use a forked repository:
+
+1. Fork https://github.com/sethwebster/AI
+2. Edit `ai-function.sh` in your fork
+3. Change `REPO_URL`:
+
+```bash
+local REPO_URL="https://github.com/yourname/AI.git"
+```
+
+4. Reinstall:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yourname/AI/main/install.sh | bash
+```
+
+---
+
+## Next Steps
+
+- [Best Practices](/docs/best-practices) - Write better code
+- [Migrations](/docs/migrations) - Understand the migration system
+- [Agents](/docs/agents) - Learn about specialized agents

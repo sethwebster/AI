@@ -1,0 +1,211 @@
+# Installation
+
+Get AI Dev Tools installed and configured in your development environment.
+
+## Quick Install (Recommended)
+
+The fastest way to get started:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/install.sh | bash
+```
+
+This one-liner:
+1. Downloads the `ai` function
+2. Adds it to your shell config (~/.zshrc or ~/.bashrc)
+3. Makes it available immediately
+
+## Manual Installation
+
+If you prefer manual setup:
+
+### Step 1: Download the Function
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/ai-function.sh >> ~/.zshrc
+```
+
+For bash users, replace `~/.zshrc` with `~/.bashrc`.
+
+### Step 2: Reload Your Shell
+
+```bash
+source ~/.zshrc  # or source ~/.bashrc
+```
+
+### Step 3: Verify Installation
+
+```bash
+ai version
+```
+
+You should see the AI Dev Tools version and logo.
+
+## Initialize a Project
+
+Navigate to your project directory and run:
+
+```bash
+ai init
+```
+
+This creates:
+
+- **AGENTS.md** - Symlinked to latest best practices
+- **CLAUDE.md** - Symlinked to project guidelines
+- **AGENT-WORKSPACE.md** - Template for project-specific context
+
+The symlinks ensure you always have the latest guidelines via `ai update`.
+
+## Install Agents
+
+Install specialized agents to Claude Code or Codex:
+
+```bash
+ai install agents
+```
+
+You'll be prompted to:
+
+1. Select which agents to install (or choose "all")
+2. Choose installation location:
+   - **Project-level** (.claude/agents/ or .codex/skills/) - Shared with team via git
+   - **User-level** (~/.claude/agents/ or ~/.codex/skills/) - Personal only, all projects
+
+## Supported Tools
+
+AI Dev Tools works with:
+
+- **Claude Code** - Anthropic's official CLI
+- **Codex** - Alternative AI coding tool
+
+The installer detects installed tools automatically.
+
+## What Gets Installed?
+
+### Shell Function
+
+The `ai` command is added to your shell config with these capabilities:
+
+- Initialize projects (`ai init`)
+- Install agents (`ai install agents`)
+- Update local repo (`ai update`)
+- Run migrations (`ai migrate`)
+- Manage registry (`ai list`, `ai forget`)
+
+### Local Repository
+
+A shallow clone is created at `~/.ai-repo-local-clone`:
+
+- Depth 1 (latest commit only)
+- No .git directory (saves space)
+- Updated via `ai update`
+
+### Registry
+
+Initialized directories are tracked in `~/.ai-registry`:
+
+- Plain text file (one path per line)
+- Enables bulk updates with `ai update-all`
+- Remove with `ai forget`
+
+## Directory Structure
+
+After `ai init`, your project has:
+
+```
+your-project/
+├── AGENTS.md           → ~/.ai-repo-local-clone/AGENTS.md (symlink)
+├── CLAUDE.md           → ~/.ai-repo-local-clone/CLAUDE.md (symlink)
+└── AGENT-WORKSPACE.md  (copy, customize this)
+```
+
+## Shell Compatibility
+
+Supported shells:
+
+- **zsh** (macOS default)
+- **bash** (Linux default, older macOS)
+
+The installer detects your shell automatically.
+
+## Troubleshooting
+
+### Command not found
+
+If `ai` is not recognized after installation:
+
+```bash
+# Reload your shell
+source ~/.zshrc  # or ~/.bashrc
+
+# Verify the function is loaded
+type ai
+```
+
+### Symlink warnings
+
+If `ai init` warns about existing files:
+
+- **Already a symlink** - No action needed, you're up to date
+- **Regular file exists** - You'll be prompted to replace it with a symlink
+
+### Permission denied
+
+If you get permission errors:
+
+```bash
+# Make the function executable
+chmod +x ~/.ai-repo-local-clone/ai-function.sh
+
+# Try the installation again
+source ~/.zshrc
+```
+
+## Uninstallation
+
+To remove AI Dev Tools:
+
+### Remove Shell Function
+
+Edit your shell config (~/.zshrc or ~/.bashrc) and delete the section:
+
+```bash
+# AI Development CLI
+ai() {
+  # ... (entire function)
+}
+```
+
+### Remove Local Repository
+
+```bash
+rm -rf ~/.ai-repo-local-clone
+```
+
+### Remove Registry
+
+```bash
+rm ~/.ai-registry
+rm ~/.ai-migration-state
+```
+
+### Remove Agents
+
+For project-level:
+```bash
+rm -rf .claude/agents/*
+rm -rf .codex/skills/*
+```
+
+For user-level:
+```bash
+rm -rf ~/.claude/agents/*
+rm -rf ~/.codex/skills/*
+```
+
+## Next Steps
+
+- [Quick Start](/docs/quick-start) - Get up and running
+- [Commands](/docs/commands) - Learn all CLI commands
+- [Agents](/docs/agents) - Meet the specialized agents

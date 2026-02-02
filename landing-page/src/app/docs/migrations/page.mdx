@@ -1,0 +1,497 @@
+# Migration System
+
+Safe, idempotent migrations for smooth AI Dev Tools upgrades.
+
+## Overview
+
+The migration system ensures smooth upgrades when AI CLI changes affect:
+
+- Installed agents/skills
+- Configuration file locations
+- Directory structures
+- Agent/skill naming conventions
+
+Migrations run automatically during `ai update`, so your installation stays current without manual intervention.
+
+---
+
+## How It Works
+
+### Automatic Execution
+
+```bash
+ai update
+
+# Output
+✦ Updating AI Dev Tools
+──────────────────────────────────────────────────
+  Fetching latest changes...
+✓ Repository updated
+
+✦ Updating shell function
+──────────────────────────────────────────────────
+✓ Shell function updated
+
+✦ Checking migrations
+──────────────────────────────────────────────────
+  → 001_rename_agents_to_personas
+✓ 1 migration(s) applied
+```
+
+### State Tracking
+
+Applied migrations are tracked in `~/.ai-migration-state`:
+
+```
+001_rename_agents_to_personas
+002_update_frontmatter_format
+```
+
+Only pending migrations run, never re-applying completed ones.
+
+---
+
+## Migration Guarantees
+
+Every migration follows three rules:
+
+### 1. Idempotence
+
+Running a migration multiple times is safe:
+
+```bash
+ai migrate up
+ai migrate up  # No errors, no duplicate changes
+```
+
+### 2. Reversibility
+
+Every migration can be rolled back:
+
+```bash
+ai migrate up    # Apply change
+ai migrate down  # Undo change
+```
+
+### 3. Safety
+
+Migrations check before acting:
+
+```bash
+# ✓ Idempotent - checks before renaming
+if [ -f "old-name.md" ]; then
+  mv "old-name.md" "new-name.md"
+fi
+
+# ✗ Unsafe - fails if already renamed
+mv "old-name.md" "new-name.md"
+```
+
+---
+
+## Commands
+
+### Check Status
+
+See applied and pending migrations:
+
+```bash
+ai migrate status
+
+# Output
+Applied:
+  ✓ 001_rename_agents_to_personas
+
+Pending:
+  ○ 002_update_frontmatter_format
+```
+
+### Apply Migrations
+
+Manually apply pending migrations:
+
+```bash
+ai migrate up
+```
+
+Usually unnecessary (runs automatically during `ai update`).
+
+### Rollback
+
+Undo the last applied migration:
+
+```bash
+ai migrate down
+
+# Output
+✦ Rolling Back Migration
+──────────────────────────────────────────────────
+  → 001_rename_agents_to_personas
+✓ Rollback complete
+```
+
+**Warning:** Only rollback if you know what you're doing.
+
+---
+
+## Migration Examples
+
+### Example: Renaming an Agent
+
+**Scenario:** Agent `neckbeard-code-reviewer` renamed to `sentinel`.
+
+**Migration:**
+
+```bash
+#!/bin/bash
+# Migration: 001
+# Description: Rename agents to use persona names
+# Version: 1.1.0
+# Date: 2024-01-15
+
+migration_up() {
+  local CHANGED=0
+
+  echo "  → Renaming agents..."
+
+  # Claude Code (project-level)
+  if [ -f ".claude/agents/neckbeard-code-reviewer.md" ]; then
+    mv ".claude/agents/neckbeard-code-reviewer.md" \
+       ".claude/agents/sentinel.md"
+    sed -i 's/^name: neckbeard-code-reviewer/name: sentinel/' \
+        ".claude/agents/sentinel.md"
+    ((CHANGED++))
+  fi
+
+  # Claude Code (user-level)
+  if [ -f "$HOME/.claude/agents/neckbeard-code-reviewer.md" ]; then
+    mv "$HOME/.claude/agents/neckbeard-code-reviewer.md" \
+       "$HOME/.claude/agents/sentinel.md"
+    sed -i 's/^name: neckbeard-code-reviewer/name: sentinel/' \
+        "$HOME/.claude/agents/sentinel.md"
+    ((CHANGED++))
+  fi
+
+  if [ $CHANGED -gt 0 ]; then
+    echo "  ✓ Renamed $CHANGED agent(s)"
+  else
+    echo "  ℹ️  Nothing to migrate"
+  fi
+}
+
+migration_down() {
+  local CHANGED=0
+
+  echo "  → Rolling back renames..."
+
+  # Reverse the changes
+  if [ -f ".claude/agents/sentinel.md" ]; then
+    mv ".claude/agents/sentinel.md" \
+       ".claude/agents/neckbeard-code-reviewer.md"
+    sed -i 's/^name: sentinel/name: neckbeard-code-reviewer/' \
+        ".claude/agents/neckbeard-code-reviewer.md"
+    ((CHANGED++))
+  fi
+
+  if [ -f "$HOME/.claude/agents/sentinel.md" ]; then
+    mv "$HOME/.claude/agents/sentinel.md" \
+       "$HOME/.claude/agents/neckbeard-code-reviewer.md"
+    sed -i 's/^name: sentinel/name: neckbeard-code-reviewer/' \
+        "$HOME/.claude/agents/neckbeard-code-reviewer.md"
+    ((CHANGED++))
+  fi
+
+  if [ $CHANGED -gt 0 ]; then
+    echo "  ✓ Rolled back $CHANGED change(s)"
+  else
+    echo "  ℹ️  Nothing to roll back"
+  fi
+}
+```
+
+---
+
+## Migration Patterns
+
+### File Rename
+
+```bash
+migration_up() {
+  if [ -f "old-file.md" ]; then
+    mv "old-file.md" "new-file.md"
+    echo "  ✓ Renamed file"
+  else
+    echo "  ℹ️  Already renamed or doesn't exist"
+  fi
+}
+
+migration_down() {
+  if [ -f "new-file.md" ]; then
+    mv "new-file.md" "old-file.md"
+    echo "  ✓ Reversed rename"
+  fi
+}
+```
+
+### Content Update
+
+```bash
+migration_up() {
+  if grep -q "old-pattern" "file.md"; then
+    sed -i 's/old-pattern/new-pattern/g' "file.md"
+    echo "  ✓ Updated content"
+  else
+    echo "  ℹ️  Already updated"
+  fi
+}
+
+migration_down() {
+  if grep -q "new-pattern" "file.md"; then
+    sed -i 's/new-pattern/old-pattern/g' "file.md"
+    echo "  ✓ Reverted content"
+  fi
+}
+```
+
+### Directory Restructure
+
+```bash
+migration_up() {
+  if [ -d "old-dir" ] && [ ! -d "new-dir" ]; then
+    mv "old-dir" "new-dir"
+    echo "  ✓ Moved directory"
+  else
+    echo "  ℹ️  Already moved"
+  fi
+}
+
+migration_down() {
+  if [ -d "new-dir" ] && [ ! -d "old-dir" ]; then
+    mv "new-dir" "old-dir"
+    echo "  ✓ Restored directory"
+  fi
+}
+```
+
+---
+
+## When Migrations Are Created
+
+Migrations are needed when changes affect user installations:
+
+### Requires Migration ✓
+
+- Renaming installed agents/skills
+- Moving configuration file locations
+- Changing directory structures
+- Updating agent/skill file formats
+- Changing frontmatter schema
+
+### No Migration Needed ✗
+
+- Adding new features (opt-in via `ai install agents`)
+- Documentation updates
+- Internal refactoring
+- Bug fixes that don't change file locations/formats
+
+---
+
+## Migration Naming
+
+Migrations use sequential numbering:
+
+```
+XXX_description.sh
+```
+
+- `XXX` - Zero-padded number (001, 002, 003)
+- `description` - Brief snake_case description
+- `.sh` - Shell script extension
+
+**Examples:**
+
+```
+001_rename_agents_to_personas.sh
+002_move_config_to_home.sh
+003_update_frontmatter_format.sh
+```
+
+---
+
+## Migration Structure
+
+### Required Functions
+
+Every migration must implement:
+
+```bash
+#!/bin/bash
+# Migration: XXX
+# Description: What this migration does
+# Version: X.Y.Z (AI CLI version)
+# Date: YYYY-MM-DD
+
+migration_up() {
+  # Apply the change
+  # Must be idempotent
+}
+
+migration_down() {
+  # Reverse the change
+  # Must be idempotent
+}
+```
+
+### Best Practices
+
+**Do:**
+
+- Check before acting (idempotence)
+- Handle both project-level and user-level installations
+- Provide clear output messages
+- Count changes and report
+- Test both `up` and `down` thoroughly
+
+**Don't:**
+
+- Assume state (always check)
+- Delete data without backup
+- Fail on missing files (check first)
+- Hard-code paths (use variables)
+
+---
+
+## Testing Migrations
+
+Before deploying:
+
+### 1. Test Forward
+
+```bash
+ai migrate up
+ai migrate up  # Should be safe (idempotent)
+```
+
+### 2. Test Rollback
+
+```bash
+ai migrate down
+ai migrate down  # Should be safe (idempotent)
+```
+
+### 3. Test Full Cycle
+
+```bash
+ai migrate up
+ai migrate down
+ai migrate up  # Should work perfectly
+```
+
+### 4. Test Edge Cases
+
+- File already renamed
+- Directory doesn't exist
+- Permissions issues
+- User-level vs project-level installations
+
+---
+
+## Migration Workflow
+
+### For Users
+
+Migrations run automatically:
+
+```bash
+ai update
+# Migrations apply automatically
+source ~/.zshrc  # Reload shell
+```
+
+No manual intervention needed.
+
+### For Developers
+
+When making breaking changes:
+
+1. Create migration file
+2. Implement `migration_up()` and `migration_down()`
+3. Test thoroughly (up, down, full cycle)
+4. Bump `AI_VERSION` in `ai-function.sh`
+5. Commit migration with version bump
+
+---
+
+## Troubleshooting
+
+### Migration Fails
+
+If a migration fails:
+
+```bash
+# Check status
+ai migrate status
+
+# Check what failed
+cat ~/.ai-migration-state
+
+# Manually fix the issue
+# Then retry
+ai migrate up
+```
+
+### Stuck Migration
+
+If a migration is stuck (half-applied):
+
+```bash
+# Manually edit state file
+nano ~/.ai-migration-state
+
+# Remove the stuck migration ID
+# Re-run
+ai migrate up
+```
+
+### Reset All Migrations
+
+**Nuclear option** (use with caution):
+
+```bash
+# Remove migration state
+rm ~/.ai-migration-state
+
+# Migrations will re-run
+ai migrate up
+```
+
+**Warning:** Only use if you understand the consequences.
+
+---
+
+## Migration History
+
+View migration history in the repo:
+
+```bash
+ls ~/.ai-repo-local-clone/migrations/
+
+# Output
+001_rename_agents_to_personas.sh
+002_update_frontmatter_format.sh
+README.md
+```
+
+Read migration details:
+
+```bash
+cat ~/.ai-repo-local-clone/migrations/001_rename_agents_to_personas.sh
+```
+
+---
+
+## Next Steps
+
+- [Commands Reference](/docs/commands) - All CLI commands
+- [Configuration](/docs/configuration) - Customize AI Dev Tools
+- [Best Practices](/docs/best-practices) - Write better code

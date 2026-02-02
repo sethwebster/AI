@@ -1,0 +1,317 @@
+# Agents
+
+Five specialized AI agents for code review, design, documentation, and systems thinking.
+
+## Overview
+
+AI Dev Tools includes five expert agents, each with a distinct personality and expertise:
+
+| Agent | Persona | Best For | Key Strength |
+|-------|---------|----------|--------------|
+| [Sentinel](/docs/agents/sentinel) | Morgan | After implementation | Security & architecture |
+| [Conversion Architect](/docs/agents/conversion-architect) | Avery | UI/UX design | Conversion & growth |
+| [Docs Engineer](/docs/agents/docs-engineer) | Sam | Documentation | Clear, functional docs |
+| [Docs Architect](/docs/agents/docs-architect) | Emerson | Standout docs | Beautiful presentation |
+| [Systems Thinker](/docs/agents/systems-thinker) | Jan | Complex problems | Multi-layer analysis |
+
+---
+
+## When to Use Which Agent
+
+### After Building Features
+
+Use **Sentinel (Morgan)** for rigorous code review:
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review auth implementation",
+  prompt: "Review JWT authentication in src/auth/ for security issues"
+}
+```
+
+### Designing User Interfaces
+
+Use **Conversion Architect (Avery)** for UX and growth:
+
+```typescript
+{
+  subagent_type: "design-visionary",
+  description: "Design landing page",
+  prompt: "Create design system for SaaS landing page targeting developers"
+}
+```
+
+### Writing Documentation
+
+Use **Docs Engineer (Sam)** for clear, accurate docs:
+
+```typescript
+{
+  subagent_type: "docs-artisan",
+  description: "Document API",
+  prompt: "Create documentation for auth API including setup, usage, and examples"
+}
+```
+
+### Polishing Public Docs
+
+Use **Docs Architect (Emerson)** for award-quality presentation:
+
+```typescript
+{
+  subagent_type: "technical-docs-artist",
+  description: "Polish README",
+  prompt: "Elevate the README with beautiful formatting and narrative flow"
+}
+```
+
+### Solving Complex Problems
+
+Use **Systems Thinker (Jan)** for deep analysis:
+
+```typescript
+{
+  subagent_type: "e6-problem-solver",
+  description: "Fix race condition",
+  prompt: "Users can double-book slots. PostgreSQL database. Design solution."
+}
+```
+
+---
+
+## Agent Comparison
+
+### Documentation Agents
+
+**When to use Docs Engineer vs Docs Architect:**
+
+| Aspect | Docs Engineer (Sam) | Docs Architect (Emerson) |
+|--------|---------------------|--------------------------|
+| **Style** | Professional, clear | Creative, beautiful |
+| **Use Case** | Standard docs | Standout docs |
+| **Focus** | Functionality | Presentation + functionality |
+| **Examples** | API docs, guides, internal READMEs | Marketing docs, flagship projects |
+
+**Choose:**
+- **Sam** for everyday documentation that needs to be accurate and clear
+- **Emerson** for public-facing docs that need to impress
+
+### Problem-Solving Agents
+
+**When to use a general agent vs Systems Thinker:**
+
+| Aspect | General Agent | Systems Thinker (Jan) |
+|--------|---------------|----------------------|
+| **Complexity** | Simple to moderate | Complex, ambiguous |
+| **Approach** | Direct implementation | Multi-layer analysis |
+| **Use Case** | Clear requirements | Unclear/multiple approaches |
+
+**Choose:**
+- **General agent** for well-defined tasks with clear requirements
+- **Jan** for architectural decisions and complex problems
+
+---
+
+## Combining Agents
+
+Use multiple agents for complex workflows:
+
+### Example: New Landing Page
+
+```typescript
+// 1. Design it
+{
+  subagent_type: "design-visionary",
+  description: "Design SaaS landing page",
+  prompt: "Create design system for SaaS landing targeting technical decision-makers"
+}
+
+// 2. Build it
+// ... implementation ...
+
+// 3. Review code
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review landing page",
+  prompt: "Review landing page implementation for performance and accessibility"
+}
+
+// 4. Document design system
+{
+  subagent_type: "technical-docs-artist",
+  description: "Document design system",
+  prompt: "Create beautiful documentation for the design system"
+}
+```
+
+### Example: Complex Feature
+
+```typescript
+// 1. Design solution
+{
+  subagent_type: "e6-problem-solver",
+  description: "Design booking system",
+  prompt: "Design a booking system that prevents double-booking and handles cancellations"
+}
+
+// 2. Implement
+// ... build the feature ...
+
+// 3. Security review
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review booking security",
+  prompt: "Review booking system for race conditions and edge cases"
+}
+
+// 4. Document API
+{
+  subagent_type: "docs-artisan",
+  description: "Document booking API",
+  prompt: "Create API documentation for the booking endpoints"
+}
+```
+
+---
+
+## Best Practices
+
+### 1. Use the Right Agent
+
+Each agent has specific expertise. Don't use Sentinel for design or Avery for code review.
+
+### 2. Provide Context
+
+More context = better results:
+
+**Bad:**
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review code",
+  prompt: "Check my code"
+}
+```
+
+**Good:**
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review auth implementation",
+  prompt: "Review JWT authentication in src/auth/ for security vulnerabilities, race conditions, and token refresh edge cases. Focus on session management and token expiration."
+}
+```
+
+### 3. Be Specific
+
+Clear prompts get better responses:
+
+**Vague:**
+```typescript
+prompt: "Make the docs better"
+```
+
+**Specific:**
+```typescript
+prompt: "Improve API docs by adding code examples for each endpoint, documenting error responses, and explaining authentication flow"
+```
+
+### 4. Combine Agents Sequentially
+
+Don't mix concerns:
+
+```typescript
+// ✓ Good - Sequential, focused
+1. Build feature
+2. Review with Sentinel
+3. Document with Docs Engineer
+
+// ✗ Bad - Mixed concerns
+"Review code AND document AND design the UI"
+```
+
+### 5. Use Proactively
+
+Don't wait for issues:
+
+- **After every feature** → Sentinel review
+- **After UI changes** → Avery review
+- **After adding functionality** → Sam documentation
+- **Before public release** → Emerson polish
+
+---
+
+## Agent Invocation
+
+### In Claude Code
+
+Using the Task tool:
+
+```typescript
+{
+  subagent_type: "agent-type-here",
+  description: "Brief 3-5 word description",
+  prompt: "Detailed prompt with full context and specific instructions"
+}
+```
+
+### Agent Types
+
+| Agent | Type |
+|-------|------|
+| Sentinel | `neckbeard-code-reviewer` |
+| Conversion Architect | `design-visionary` |
+| Docs Engineer | `docs-artisan` |
+| Docs Architect | `technical-docs-artist` |
+| Systems Thinker | `e6-problem-solver` |
+
+---
+
+## Common Workflows
+
+### New Feature
+
+```
+1. Implement feature
+2. ai task → Sentinel (review code)
+3. ai task → Docs Engineer (document)
+4. Commit
+```
+
+### UI Work
+
+```
+1. ai task → Conversion Architect (design)
+2. Implement UI
+3. ai task → Sentinel (review)
+4. ai task → Docs Architect (document design system)
+```
+
+### Bug Fix
+
+```
+1. ai task → Systems Thinker (analyze root cause)
+2. Implement fix
+3. ai task → Sentinel (review fix)
+4. Add tests
+```
+
+### Architecture Decision
+
+```
+1. ai task → Systems Thinker (evaluate options)
+2. Create ADR
+3. ai task → Sentinel (review ADR)
+4. Implement
+```
+
+---
+
+## Next Steps
+
+- [Sentinel (Morgan)](/docs/agents/sentinel) - Code review and security
+- [Conversion Architect (Avery)](/docs/agents/conversion-architect) - UX and growth
+- [Docs Engineer (Sam)](/docs/agents/docs-engineer) - Clear documentation
+- [Docs Architect (Emerson)](/docs/agents/docs-architect) - Beautiful docs
+- [Systems Thinker (Jan)](/docs/agents/systems-thinker) - Complex problems

@@ -1,0 +1,182 @@
+# Docs Engineer (Sam)
+
+Implementation-grade documentation focused on accuracy, clarity, completeness, and developer usability.
+
+## Overview
+
+**Agent Type:** `docs-artisan`
+**Persona:** Sam
+**Expertise:** Clear, functional documentation
+
+Sam is your go-to for everyday documentation. Documentation that's accurate, complete, and gets developers up and running quickly.
+
+---
+
+## When to Deploy
+
+Use Docs Engineer:
+
+- After adding new features
+- When creating API documentation
+- For user guides and tutorials
+- When updating README files
+- For architecture documentation
+
+**Proactive usage:** Document as you build, not after you ship.
+
+---
+
+## Expertise
+
+Sam excels at:
+
+- **Accuracy** - Every detail verified and correct
+- **Clarity** - No ambiguity, no confusion
+- **Completeness** - All parameters, options, edge cases covered
+- **Developer usability** - Quick starts, code examples, common workflows
+- **Searchability** - Clear headings, logical structure
+- **Maintenance** - Easy to update and keep current
+
+---
+
+## Examples
+
+### API Documentation
+
+**Scenario:** Built authentication API endpoints.
+
+**Invocation:**
+
+```typescript
+{
+  subagent_type: "docs-artisan",
+  description: "Document auth API",
+  prompt: "Create API documentation for authentication endpoints in src/api/auth/. Include setup, all endpoints with parameters, request/response examples, error codes, and security considerations."
+}
+```
+
+**What Sam produces:**
+
+- Clear endpoint descriptions
+- Complete parameter tables
+- Request/response examples
+- Error code reference
+- Authentication requirements
+- Rate limiting details
+
+---
+
+### User Guide
+
+**Scenario:** Added new booking feature.
+
+**Invocation:**
+
+```typescript
+{
+  subagent_type: "docs-artisan",
+  description: "Create booking guide",
+  prompt: "Write user guide for the booking system. Cover how to create, modify, and cancel bookings. Include screenshots, common workflows, and troubleshooting."
+}
+```
+
+**What Sam produces:**
+
+- Step-by-step instructions
+- Screenshots with annotations
+- Common workflows
+- Troubleshooting section
+- FAQs
+
+---
+
+### README File
+
+**Scenario:** New open-source project needs README.
+
+**Invocation:**
+
+```typescript
+{
+  subagent_type: "docs-artisan",
+  description: "Create README",
+  prompt: "Create README for the payment processing library. Include installation, quick start, API reference, examples, and contribution guidelines."
+}
+```
+
+**What Sam produces:**
+
+- One-line project description
+- Installation instructions
+- Quick start guide
+- API reference
+- Usage examples
+- Contributing guidelines
+
+---
+
+## How to Invoke
+
+```typescript
+{
+  subagent_type: "docs-artisan",
+  description: "Brief description (3-5 words)",
+  prompt: "Detailed prompt with scope and focus"
+}
+```
+
+---
+
+## What Makes Good Documentation
+
+### Structure
+
+- **Prerequisites** - What users need before starting
+- **Quick Start** - Get to success in less than 5 minutes
+- **Concepts** - Build understanding progressively
+- **Reference** - Complete API surface
+- **Examples** - Runnable code samples
+
+### Code Samples
+
+- **Runnable** - Not toy examples, real code
+- **Complete** - Include imports, setup, expected output
+- **Commented** - Explain non-obvious logic
+- **Tested** - Actually works
+
+### Style
+
+- **Active voice** - "Click the button" not "The button is clicked"
+- **Present tense** - "Returns user" not "Will return user"
+- **Scannable** - Short paragraphs, clear headings
+- **Accessible** - Works with screen readers
+
+---
+
+## Workflow Integration
+
+### After Feature Implementation
+
+```
+1. Implement feature
+2. ai task → Sentinel (review code)
+3. ai task → Docs Engineer (document)
+4. Commit with docs
+```
+
+### Before Release
+
+```
+1. Update documentation
+2. ai task → Docs Engineer (review/improve)
+3. Test all examples
+4. Ship
+```
+
+---
+
+## Next Steps
+
+- [Docs Architect](/docs/agents/docs-architect) - Beautiful documentation
+- [Agents Overview](/docs/agents) - Compare all agents
+- [Best Practices](/docs/best-practices) - Documentation standards

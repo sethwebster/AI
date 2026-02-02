@@ -1,0 +1,535 @@
+# Best Practices
+
+Enterprise-grade development practices from AGENTS.md.
+
+## Core Principles
+
+AI Dev Tools embodies five fundamental principles:
+
+### 1. Explicit Over Implicit
+
+Every decision must have a clear rationale:
+
+```typescript
+// ✗ Implicit behavior
+const config = {
+  timeout: 5000  // Why 5000? Magic number
+}
+
+// ✓ Explicit reasoning
+const REQUEST_TIMEOUT_MS = 5000  // 5s for slow connections, fails fast for dead servers
+const config = {
+  timeout: REQUEST_TIMEOUT_MS
+}
+```
+
+**Application:**
+- No magic values or hidden assumptions
+- State changes must be traceable
+- Dependencies declared upfront
+- Document the "why", not just the "what"
+
+---
+
+### 2. Fail Fast, Fail Loud
+
+No silent failures or degraded modes:
+
+```typescript
+// ✗ Silent failure
+try {
+  await sendEmail(user)
+} catch {
+  // User never knows email failed
+}
+
+// ✓ Fail loud
+try {
+  await sendEmail(user)
+} catch (error) {
+  logger.error('Email failed', { userId: user.id, error })
+  throw new EmailError('Failed to send welcome email', { cause: error })
+}
+```
+
+**Application:**
+- Validate inputs at boundaries
+- Throw errors immediately when invariants break
+- Never catch exceptions just to log them
+- Return Result types instead of throwing when failure is expected
+
+---
+
+### 3. Optimize for Deletion
+
+Code that doesn't exist can't break:
+
+```typescript
+// ✗ Premature abstraction
+class UserEmailService {
+  async sendWelcome(user) { /* ... */ }
+  async sendReset(user) { /* ... */ }
+  async sendNotification(user) { /* ... */ }
+}
+
+// ✓ Inline until third use
+async function sendWelcomeEmail(user) { /* ... */ }
+async function sendResetEmail(user) { /* ... */ }
+// Only abstract when pattern emerges
+```
+
+**Application:**
+- Delete > Comment out > Keep
+- Prefer inline over abstraction until third use
+- Remove dead code immediately
+- Question every line: "Does this need to exist?"
+
+---
+
+### 4. Trust Nothing, Verify Everything
+
+Type systems prevent bugs, runtime checks prevent disasters:
+
+```typescript
+// ✗ Trusting input
+export async function createUser(req: Request) {
+  const data = await req.json()
+  return await db.insert(users).values(data)  // SQL injection!
+}
+
+// ✓ Validate at boundary
+export async function createUser(req: Request) {
+  const input = validateCreateUserInput(await req.json())  // Validated
+  return await userService.create(input)  // Trusted
+}
+```
+
+**Application:**
+- User input is hostile until proven otherwise
+- External APIs will fail in unexpected ways
+- Database constraints are your last line of defense
+- Validate, then trust; never assume
+
+---
+
+### 5. Critical Thinking Over Agreement
+
+Challenge assumptions, question solutions:
+
+```typescript
+// ✗ Sycophantic
+Developer: "Let's add a try-catch around everything"
+Agent: "Great idea!"
+
+// ✓ Critical
+Developer: "Let's add a try-catch around everything"
+Agent: "That would hide failures. Instead, identify specific failure modes
+        and handle each appropriately. What errors need handling?"
+```
+
+**Application:**
+- "You're right" requires verification
+- "Great idea" requires explaining why
+- Disagreement shows engagement, not opposition
+- Technical conversations require scrutiny
+
+---
+
+## Code Quality Standards
+
+### Complexity Budget
+
+Hard limits:
+
+| Metric | Target | Hard Limit |
+|--------|--------|------------|
+| Function lines | ≤50 | ≤100 |
+| File lines | ≤500 | ≤1000 |
+| Cyclomatic complexity | ≤10 | per function |
+| Nesting depth | ≤3 | levels |
+| Function parameters | ≤4 | (use objects) |
+
+### Zero Tolerance
+
+Never allowed:
+
+- ❌ `any` types (use `unknown` + type guards)
+- ❌ Non-null assertions (`!`) without comments
+- ❌ Empty catch blocks
+- ❌ Disabled linter rules without issue links
+- ❌ TODO comments without owner + date
+- ❌ Console.log in production code
+- ❌ Commented-out code
+- ❌ Magic numbers (use named constants)
+
+### Required Patterns
+
+Always use:
+
+- ✅ Discriminated unions for state machines
+- ✅ Exhaustive switch statements (no default for enums)
+- ✅ Early returns for guard clauses
+- ✅ Immutable data structures
+- ✅ Pure functions wherever possible
+- ✅ Dependency injection over singletons
+
+---
+
+## Testing
+
+### Test-First Development
+
+**Non-negotiable workflow:**
+
+1. Write failing test
+2. Verify test fails for right reason
+3. Implement minimum code
+4. Test passes
+5. Refactor (test still passing)
+
+```typescript
+// 1. Write test (RED)
+it('should reject invalid email', () => {
+  expect(() => validateEmail('not-an-email')).toThrow()
+})
+
+// 2. Implement (GREEN)
+function validateEmail(email: string) {
+  if (!email.includes('@')) throw new Error('Invalid email')
+  return email
+}
+
+// 3. Refactor
+function validateEmail(email: string) {
+  if (!EMAIL_REGEX.test(email)) {
+    throw new ValidationError('email', 'invalid_format')
+  }
+  return email
+}
+```
+
+### Coverage Targets
+
+- **Unit tests:** ≥80% line coverage
+- **Integration tests:** All critical paths
+- **E2E tests:** Primary user flows
+- **No mocking in E2E tests**
+
+---
+
+## Architecture
+
+### Layered Architecture
+
+```
+Presentation (UI)
+     ↓
+Application (Hooks/Controllers)
+     ↓
+Domain (Business Logic)
+     ↓
+Infrastructure (DB/API/Cache)
+```
+
+**Rules:**
+
+- Higher layers depend on lower only
+- Domain layer has zero external dependencies
+- Infrastructure implements domain interfaces
+- Circular dependencies = architectural failure
+
+---
+
+## Security
+
+### Input Validation
+
+Always validate at boundaries:
+
+```typescript
+// ✓ Validate once at entry
+export async function createUser(req: Request) {
+  const input = validateCreateUserInput(await req.json())
+  // Now trusted
+  return await userService.create(input)
+}
+
+// Domain layer trusts input
+class UserService {
+  create(input: ValidatedCreateUserInput) {
+    // No validation needed here
+  }
+}
+```
+
+### Authentication
+
+- Never roll your own crypto
+- Use established libraries (Auth.js, Lucia)
+- Store only hashed passwords (bcrypt, Argon2)
+- Session tokens: ≥128 bits, cryptographically random
+- Expire sessions (30d max, 24h for sensitive)
+
+### Authorization
+
+```typescript
+// ✓ Explicit permissions
+function canDeletePost(user: User, post: Post): boolean {
+  return user.id === post.authorId || user.role === 'admin'
+}
+
+// Check before action
+if (!canDeletePost(user, post)) {
+  throw new ForbiddenError('Cannot delete post')
+}
+await deletePost(post.id)
+```
+
+---
+
+## Performance
+
+### Caching Strategy
+
+Layered caching for optimal performance:
+
+```typescript
+async function getUser(id: UserId): Promise<User> {
+  // L1: In-memory (fastest)
+  const cached = memoryCache.get(id)
+  if (cached) return cached
+
+  // L2: Redis (fast)
+  const redisData = await redis.get(`user:${id}`)
+  if (redisData) {
+    const user = JSON.parse(redisData)
+    memoryCache.set(id, user)
+    return user
+  }
+
+  // L3: Database (slow)
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, id)
+  })
+
+  if (user) {
+    await redis.setex(`user:${id}`, 300, JSON.stringify(user))
+    memoryCache.set(id, user)
+  }
+
+  return user
+}
+```
+
+### Cache Invalidation
+
+Explicit invalidation required:
+
+```typescript
+async function updateUser(id: UserId, data: UserUpdate) {
+  const user = await db.update(users)
+    .set(data)
+    .where(eq(users.id, id))
+    .returning()
+
+  // Invalidate all cache layers
+  memoryCache.delete(id)
+  await redis.del(`user:${id}`)
+
+  return user
+}
+```
+
+---
+
+## Common Pitfalls
+
+### Race Conditions
+
+```typescript
+// ✗ Race condition
+const count = await getCount()
+await setCount(count + 1)
+
+// ✓ Atomic operation
+await db.update(counter).set({
+  value: sql`${counter.value} + 1`
+})
+```
+
+### N+1 Queries
+
+```typescript
+// ✗ N+1 queries
+const posts = await db.select().from(posts)
+for (const post of posts) {
+  post.author = await db.query.users.findFirst({
+    where: eq(users.id, post.authorId)
+  })
+}
+
+// ✓ Eager loading
+const posts = await db
+  .select()
+  .from(posts)
+  .leftJoin(users, eq(users.id, posts.authorId))
+```
+
+### Memory Leaks
+
+Watch for:
+
+- Event listeners not cleaned up
+- Intervals/timeouts not cleared
+- Growing caches without eviction
+- Circular references in closures
+
+---
+
+## Git Workflow
+
+### Commit Messages
+
+Format:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+Types:
+
+- `feat` - New feature
+- `fix` - Bug fix
+- `perf` - Performance improvement
+- `refactor` - Code restructuring
+- `test` - Test additions/changes
+- `docs` - Documentation only
+- `chore` - Build, CI, dependencies
+
+**Rules:**
+
+- Subject: ≤50 chars, imperative mood, no period
+- Body: Wrap at 72 chars, explain why not what
+- Reference issues/ADRs in footer
+
+**Example:**
+
+```
+feat(auth): add JWT refresh token rotation
+
+Implements refresh token rotation to prevent token replay attacks.
+Tokens expire after 15 minutes, refresh tokens after 7 days.
+
+Refs #123
+Implements ADR-042
+```
+
+---
+
+## Documentation
+
+### Code Comments
+
+Only comment:
+
+- **Why**, not what (code shows what)
+- Non-obvious optimizations
+- Workarounds for external bugs
+- Complex algorithms (link to paper/article)
+- Security-sensitive code
+
+```typescript
+// ✗ Obvious comment
+// Increment counter by 1
+counter += 1
+
+// ✓ Explains rationale
+// Use post-increment to avoid race with concurrent readers
+counter += 1
+```
+
+---
+
+## Architecture Decision Records (ADRs)
+
+**Required for:**
+
+- Architectural patterns
+- Framework/library selection
+- API contracts
+- Security policies
+- Performance trade-offs
+
+**Format:**
+
+```markdown
+# ADR-001: Use PostgreSQL for primary database
+
+**Status:** Accepted
+**Date:** 2024-01-15
+**Deciders:** @dev1, @dev2
+
+## Context
+Need reliable database with ACID guarantees and complex query support.
+
+## Decision
+Use PostgreSQL 15 as primary database.
+
+## Consequences
+### Positive
+- Strong consistency guarantees
+- Rich query capabilities
+- Proven reliability
+
+### Negative
+- More complex than NoSQL
+- Requires careful migration strategy
+```
+
+---
+
+## Workflow Summary
+
+### Daily Workflow
+
+```
+1. Pull latest changes
+2. Write failing test
+3. Implement feature
+4. Deploy Sentinel for review
+5. Fix issues
+6. Deploy Docs Engineer for documentation
+7. Commit with meaningful message
+8. Push
+```
+
+### Before PR
+
+```
+1. Self-review
+2. Deploy Sentinel for code review
+3. Run all tests
+4. Update documentation
+5. Create PR with clear description
+```
+
+### After PR Approval
+
+```
+1. Squash if needed
+2. Merge
+3. Delete branch
+4. Update local main
+```
+
+---
+
+## Next Steps
+
+- [Agents Overview](/docs/agents) - Meet the specialized agents
+- [Sentinel](/docs/agents/sentinel) - Code review best practices
+- [Commands](/docs/commands) - CLI reference

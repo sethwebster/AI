@@ -1,0 +1,255 @@
+# Quick Start
+
+Get started with AI Dev Tools in 5 minutes.
+
+## Install AI Dev Tools
+
+Run the installer:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/install.sh | bash
+```
+
+Reload your shell:
+
+```bash
+source ~/.zshrc  # or ~/.bashrc for bash
+```
+
+Verify installation:
+
+```bash
+ai version
+```
+
+## Initialize Your Project
+
+Navigate to your project:
+
+```bash
+cd ~/my-project
+```
+
+Initialize AI Dev Tools:
+
+```bash
+ai init
+```
+
+This creates three files:
+
+| File | Type | Purpose |
+|------|------|---------|
+| AGENTS.md | Symlink | Enterprise best practices (always up to date) |
+| CLAUDE.md | Symlink | Project guidelines (always up to date) |
+| AGENT-WORKSPACE.md | Copy | Your workspace context (customize this) |
+
+## Install Agents
+
+Install specialized agents:
+
+```bash
+ai install agents
+```
+
+### Choose Agents
+
+You'll see five options:
+
+1. **Sentinel (Morgan)** - Code review, security analysis
+2. **Conversion Architect (Avery)** - UX & growth design
+3. **Docs Engineer (Sam)** - Clear documentation
+4. **Docs Architect (Emerson)** - Beautiful documentation
+5. **Systems Thinker (Jan)** - Deep problem solving
+
+Type numbers (space-separated) or "all":
+
+```
+Select agents (space-separated numbers or 'all'): 1 3 5
+```
+
+Or install everything:
+
+```
+Select agents (space-separated numbers or 'all'): all
+```
+
+### Choose Location
+
+**For Claude Code:**
+
+```
+1  Project-level .claude/agents/
+   Shared with team via git
+
+2  User-level ~/.claude/agents/
+   Personal only, all projects
+
+Selection (1/2): 1
+```
+
+**For Codex:**
+
+```
+1  Project-scoped .codex/skills/
+   This repo only
+
+2  User-scoped ~/.codex/skills/
+   All repos
+
+Selection (1/2): 1
+```
+
+Choose based on:
+- **Project-level** - Entire team uses the same agents
+- **User-level** - Just you, across all projects
+
+## Use an Agent
+
+### In Claude Code
+
+After implementing a feature:
+
+```typescript
+// Using the Task tool
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review auth implementation",
+  prompt: "Review JWT authentication in src/auth/ for security issues and race conditions"
+}
+```
+
+After building UI:
+
+```typescript
+{
+  subagent_type: "design-visionary",
+  description: "Review landing page",
+  prompt: "Review the landing page design for conversion optimization and mobile UX"
+}
+```
+
+For documentation:
+
+```typescript
+{
+  subagent_type: "docs-artisan",
+  description: "Document API",
+  prompt: "Create API documentation for the authentication endpoints including examples and error codes"
+}
+```
+
+### In Codex
+
+Use the same agent types with Codex's skill system.
+
+## Your First Workflow
+
+Here's a complete workflow:
+
+### 1. Build a Feature
+
+```bash
+# Work on authentication
+git checkout -b feature/auth
+# ... implement JWT authentication ...
+```
+
+### 2. Review Code
+
+Use **Sentinel (Morgan)** for code review:
+
+```typescript
+{
+  subagent_type: "neckbeard-code-reviewer",
+  description: "Review auth system",
+  prompt: "Review the authentication system for security vulnerabilities, race conditions, and architectural concerns"
+}
+```
+
+### 3. Document It
+
+Use **Docs Engineer (Sam)** for clear docs:
+
+```typescript
+{
+  subagent_type: "docs-artisan",
+  description: "Document auth API",
+  prompt: "Create documentation for the authentication API including setup, endpoints, examples, and security considerations"
+}
+```
+
+### 4. Polish (Optional)
+
+For public-facing docs, use **Docs Architect (Emerson)**:
+
+```typescript
+{
+  subagent_type: "technical-docs-artist",
+  description: "Polish auth docs",
+  prompt: "Elevate the authentication docs with beautiful formatting, narrative flow, and visual hierarchy"
+}
+```
+
+## Keep Everything Updated
+
+Update AI Dev Tools:
+
+```bash
+ai update
+```
+
+This:
+1. Updates `~/.ai-repo-local-clone`
+2. Updates the `ai` shell function
+3. Runs pending migrations automatically
+
+Your symlinked files (AGENTS.md, CLAUDE.md) automatically reflect the latest changes.
+
+## Update All Projects
+
+If you have multiple projects:
+
+```bash
+ai update-all
+```
+
+This updates every directory in your registry.
+
+## Common Commands
+
+```bash
+# Initialize project
+ai init
+
+# Install agents
+ai install agents
+
+# Update current project
+ai update
+
+# Update all registered projects
+ai update-all
+
+# List registered projects
+ai list
+
+# Remove current project from registry
+ai forget
+
+# Check migration status
+ai migrate status
+
+# Show version
+ai version
+
+# Show help
+ai help
+```
+
+## Next Steps
+
+- [Commands Reference](/docs/commands) - Learn all CLI commands
+- [Agents Guide](/docs/agents) - Deep dive into each agent
+- [Migration System](/docs/migrations) - Understand migrations
+- [Best Practices](/docs/best-practices) - Write better code

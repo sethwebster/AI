@@ -48,9 +48,7 @@ export function Navbar() {
             How It Works
           </Link>
           <Link
-            href="https://github.com/sethwebster/AI"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/docs"
             className="hover:text-white transition-colors"
           >
             Docs

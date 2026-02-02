@@ -1,0 +1,404 @@
+# CLI Commands
+
+Complete reference for the `ai` command-line tool.
+
+## Overview
+
+The `ai` CLI manages AI Dev Tools across your projects. All commands are designed to be safe, idempotent, and helpful.
+
+```bash
+ai <command> [options]
+```
+
+## Commands
+
+### `ai init`
+
+Initialize the current directory with AI Dev Tools.
+
+```bash
+ai init
+```
+
+**What it does:**
+
+1. Clones/updates `~/.ai-repo-local-clone` (shallow clone, depth 1)
+2. Creates symlinks in current directory:
+   - `AGENTS.md` → `~/.ai-repo-local-clone/AGENTS.md`
+   - `CLAUDE.md` → `~/.ai-repo-local-clone/CLAUDE.md`
+3. Copies `AGENT-WORKSPACE.md` template (if not exists)
+4. Registers directory in `~/.ai-registry`
+
+**Behavior:**
+
+- Safe to run multiple times (idempotent)
+- Prompts before replacing existing non-symlink files
+- Skips files that are already correct symlinks
+
+**Example output:**
+
+```
+╭────────────────────────────────────────────────────────────╮
+│  Welcome to AI Dev Tools                                   │
+│  Expert AI agents for Claude Code & Codex                  │
+╰────────────────────────────────────────────────────────────┘
+
+✦ Setting up local repository
+──────────────────────────────────────────────────
+  Updating existing repo...
+✓ Repository ready
+
+✦ Creating symlinks
+──────────────────────────────────────────────────
+✓ AGENTS.md → symlinked
+✓ CLAUDE.md → symlinked
+✓ AGENT-WORKSPACE.md → created
+
+✦ Next steps
+──────────────────────────────────────────────────
+  $ cat AGENTS.md                Review agent guidelines
+  $ ai install agents            Install agents to Claude/Codex
+  $ ai update                    Keep everything up to date
+```
+
+---
+
+### `ai install agents`
+
+Install specialized agent definitions to Claude Code or Codex.
+
+```bash
+ai install agents
+```
+
+**Interactive prompts:**
+
+1. **Select agents** - Choose which agents to install (or "all")
+2. **Choose location** - Project-level or user-level installation
+
+**Available agents:**
+
+1. Sentinel (Morgan) - Code review, security
+2. Conversion Architect (Avery) - UX & growth design
+3. Docs Engineer (Sam) - Clear documentation
+4. Docs Architect (Emerson) - Beautiful documentation
+5. Systems Thinker (Jan) - Deep problem solving
+
+**Installation locations:**
+
+| Tool | Project-level | User-level |
+|------|---------------|------------|
+| Claude Code | `.claude/agents/` | `~/.claude/agents/` |
+| Codex | `.codex/skills/` | `~/.codex/skills/` |
+
+**Example:**
+
+```bash
+ai install agents
+
+# Select agents
+Select agents (space-separated numbers or 'all'): 1 3 5
+
+# Choose location
+1  Project-level .claude/agents/
+2  User-level ~/.claude/agents/
+Selection (1/2): 1
+```
+
+**Note:** Restart your AI coding tool after installation to load the new agents.
+
+---
+
+### `ai update`
+
+Update the current directory with latest AI Dev Tools.
+
+```bash
+ai update
+```
+
+**What it does:**
+
+1. Updates `~/.ai-repo-local-clone` (re-clones at depth 1)
+2. Updates the `ai` shell function in your config
+3. Runs pending migrations automatically
+4. Symlinked files automatically reflect changes
+
+**Workflow:**
+
+```bash
+ai update
+
+# Output
+✦ Updating AI Dev Tools
+──────────────────────────────────────────────────
+  Fetching latest changes...
+✓ Repository updated
+ℹ Symlinked files now reflect latest changes
+
+✦ Updating shell function
+──────────────────────────────────────────────────
+✓ Shell function updated
+
+⚠ Reload your shell to use updated function:
+  $ source ~/.zshrc
+
+✦ Checking migrations
+──────────────────────────────────────────────────
+  → 001_rename_agents_to_personas
+✓ 1 migration(s) applied
+```
+
+**Important:** Reload your shell after updating:
+
+```bash
+source ~/.zshrc  # or ~/.bashrc
+```
+
+---
+
+### `ai update-all`
+
+Update all registered directories.
+
+```bash
+ai update-all
+```
+
+**What it does:**
+
+Runs `ai update` in every directory listed in `~/.ai-registry`.
+
+**Example:**
+
+```bash
+ai update-all
+
+# Output
+✦ Updating 3 registered directories
+──────────────────────────────────────────────────
+  [1/3] /Users/you/project-a
+       ✓ Repository updated
+       ...
+  [2/3] /Users/you/project-b
+       ✓ Repository updated
+       ...
+  [3/3] /Users/you/project-c
+       ✓ Repository updated
+       ...
+
+✓ All 3 directories updated
+```
+
+**Note:** Skips directories that no longer exist.
+
+---
+
+### `ai migrate`
+
+Manage database-style migrations for AI Dev Tools.
+
+```bash
+ai migrate [up|down|status]
+```
+
+#### `ai migrate up`
+
+Apply all pending migrations:
+
+```bash
+ai migrate up
+```
+
+Migrations run automatically during `ai update`, so you rarely need this.
+
+#### `ai migrate down`
+
+Rollback the last applied migration:
+
+```bash
+ai migrate down
+```
+
+**Warning:** Only rollback if you know what you're doing.
+
+#### `ai migrate status`
+
+Show migration status:
+
+```bash
+ai migrate status
+
+# Output
+Applied:
+  ✓ 001_rename_agents_to_personas
+
+Pending:
+  ○ 002_update_frontmatter_format
+```
+
+---
+
+### `ai list`
+
+List all registered directories.
+
+```bash
+ai list
+
+# Output
+✦ Registered Directories
+──────────────────────────────────────────────────
+  ✓ /Users/you/project-a
+  ✓ /Users/you/project-b
+  ✗ /Users/you/old-project (not found)
+```
+
+**Status indicators:**
+
+- ✓ Directory exists
+- ✗ Directory not found (removed from filesystem)
+
+---
+
+### `ai forget`
+
+Remove current directory from registry.
+
+```bash
+ai forget
+
+# Output
+✓ Removed from registry
+  /Users/you/current-project
+```
+
+**What it does:**
+
+- Removes directory from `~/.ai-registry`
+- Does NOT delete any files
+- Directory no longer updated by `ai update-all`
+
+---
+
+### `ai version`
+
+Show version information.
+
+```bash
+ai version
+
+# Output
+    ___    ____   ____
+   /   |  /  _/  / __ \___  _   __
+  / /| |  / /   / / / / _ \| | / /
+ / ___ |_/ /   / /_/ /  __/ |/ /
+/_/  |_/___/  /_____/\___/|___/
+
+╭────────────────────────╮
+│ ● v1.1.0 AI Dev Tools  │
+╰────────────────────────╯
+
+  Source: github.com/sethwebster/AI
+```
+
+---
+
+### `ai help`
+
+Show help message.
+
+```bash
+ai help
+
+# Output
+✦ Commands
+──────────────────────────────────────────────────
+  ai init             Initialize directory with AI dev best practices
+  ai install agents   Install agent definitions into Claude/Codex
+
+  ai update           Update local repo, shell function & migrations
+  ai update-all       Update all registered directories
+
+  ai migrate          Run pending migrations (up|down|status)
+
+  ai list             List registered directories
+  ai forget           Remove current directory from registry
+
+  ai version          Show version information
+  ai help             Show this help message
+```
+
+---
+
+## Environment
+
+### Files & Directories
+
+| Location | Purpose |
+|----------|---------|
+| `~/.ai-repo-local-clone/` | Local repository cache |
+| `~/.ai-registry` | List of initialized directories |
+| `~/.ai-migration-state` | Applied migrations |
+| `~/.zshrc` or `~/.bashrc` | Shell function definition |
+
+### Project Files
+
+| File | Type | Purpose |
+|------|------|---------|
+| `AGENTS.md` | Symlink | Enterprise best practices |
+| `CLAUDE.md` | Symlink | Project guidelines |
+| `AGENT-WORKSPACE.md` | Copy | Workspace context (customize) |
+
+---
+
+## Exit Codes
+
+All commands follow Unix conventions:
+
+- `0` - Success
+- `1` - Error
+
+---
+
+## Common Workflows
+
+### New Project Setup
+
+```bash
+cd ~/new-project
+ai init
+ai install agents
+# Select agents and location
+```
+
+### Regular Updates
+
+```bash
+# Update current project
+ai update
+source ~/.zshrc
+
+# Or update everything
+ai update-all
+```
+
+### Cleanup
+
+```bash
+# Remove from registry (keeps files)
+ai forget
+
+# Or fully uninstall
+rm -rf ~/.ai-repo-local-clone
+rm ~/.ai-registry ~/.ai-migration-state
+# Edit ~/.zshrc to remove ai() function
+```
+
+---
+
+## Next Steps
+
+- [Configuration](/docs/configuration) - Customize AI Dev Tools
+- [Agents](/docs/agents) - Learn about specialized agents
+- [Migrations](/docs/migrations) - Migration system details
