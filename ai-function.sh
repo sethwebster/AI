@@ -791,7 +791,7 @@ ai() {
 
 			local -a AGENTS=(
 				"sentinel:Sentinel (Morgan):sentinel"
-				"conversion-architect:Conversion Architect (Avery):conversion-architect"
+				"product-ux-designer:Conversion Architect (Avery):product-ux-designer"
 				"docs-engineer:Docs Engineer (Sam):docs-engineer"
 				"docs-architect:Docs Architect (Emerson):docs-architect"
 				"systems-thinker:Systems Thinker (Jan):systems-thinker"

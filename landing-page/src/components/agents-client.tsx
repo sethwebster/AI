@@ -39,16 +39,14 @@ export function AgentsClient({ agents }: AgentsClientProps) {
         <div className="mb-16 text-center">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             className="text-sm font-medium text-cyan-400 uppercase tracking-wider mb-3"
           >
             Meet the Agents
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="text-3xl md:text-5xl font-bold text-white mb-4"
           >
@@ -56,8 +54,7 @@ export function AgentsClient({ agents }: AgentsClientProps) {
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="text-zinc-400 max-w-2xl mx-auto"
           >

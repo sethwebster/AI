@@ -17,17 +17,17 @@ Uber Tech Lead & system steward providing senior oversight across code, architec
 
 ---
 
-### [Conversion Architect](./conversion-architect.md) (Avery)
-**Type:** `conversion-architect`
+### [Product/UX Designer](./product-ux-designer.md) (Avery)
+**Type:** `product-ux-designer`
 
-Conversion-optimized design strategist focused on user behavior, growth leverage, UX clarity, and commercially effective design decisions.
+World-class product and UX designer focused on user-centered design, interface excellence, visual hierarchy, and shipping beautiful products that users love.
 
 **Best for:**
-- Landing pages
-- Product pages
-- Mobile app UI
+- Product interfaces
 - Design systems
-- Animation strategy
+- User flows
+- Mobile app UI
+- Landing pages
 
 ---
 
@@ -135,7 +135,7 @@ Hardware and embedded systems specialist with expertise in circuit design, firmw
 | Agent | Persona | When to Use | Key Strength |
 |-------|---------|------------|--------------|
 | Sentinel | Morgan | After implementation | Security & architecture |
-| Conversion Architect | Avery | UI/UX design needed | Conversion & growth |
+| Product/UX Designer | Avery | UI/UX design needed | Interface excellence |
 | Docs Engineer | Sam | Documentation needed | Clear, functional docs |
 | Docs Architect | Emerson | Standout docs needed | Beautiful presentation |
 | Systems Thinker | Jan | Complex problems | Multi-layer analysis |
@@ -174,7 +174,7 @@ Hardware and embedded systems specialist with expertise in circuit design, firmw
 ```typescript
 // 1. Design it
 {
-  subagent_type: "conversion-architect",
+  subagent_type: "product-ux-designer",
   description: "Design SaaS landing page",
   prompt: "Create design system for SaaS landing page targeting technical decision-makers"
 }

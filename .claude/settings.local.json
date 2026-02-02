@@ -28,7 +28,8 @@
       "Bash(ai unknown_command)",
       "Bash(ai version:*)",
       "Bash(npm install:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(npm ls:*)"
     ]
   }
 }

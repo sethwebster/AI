@@ -43,7 +43,7 @@ const navigation: NavSection[] = [
     items: [
       { title: "Overview", href: "/docs/agents", icon: Users },
       { title: "Sentinel (Morgan)", href: "/docs/agents/sentinel" },
-      { title: "Conversion Architect (Avery)", href: "/docs/agents/conversion-architect" },
+      { title: "Product/UX Designer (Avery)", href: "/docs/agents/product-ux-designer" },
       { title: "Docs Engineer (Sam)", href: "/docs/agents/docs-engineer" },
       { title: "Docs Architect (Emerson)", href: "/docs/agents/docs-architect" },
       { title: "Systems Thinker (Jan)", href: "/docs/agents/systems-thinker" },

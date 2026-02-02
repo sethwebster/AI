@@ -9,7 +9,7 @@ AI Dev Tools includes five expert agents, each with a distinct personality and e
 | Agent | Persona | Best For | Key Strength |
 |-------|---------|----------|--------------|
 | [Sentinel](/docs/agents/sentinel) | Morgan | After implementation | Security & architecture |
-| [Conversion Architect](/docs/agents/conversion-architect) | Avery | UI/UX design | Conversion & growth |
+| [Conversion Architect](/docs/agents/product-ux-designer) | Avery | UI/UX design | Conversion & growth |
 | [Docs Engineer](/docs/agents/docs-engineer) | Sam | Documentation | Clear, functional docs |
 | [Docs Architect](/docs/agents/docs-architect) | Emerson | Standout docs | Beautiful presentation |
 | [Systems Thinker](/docs/agents/systems-thinker) | Jan | Complex problems | Multi-layer analysis |
@@ -36,7 +36,7 @@ Use **Conversion Architect (Avery)** for UX and growth:
 
 ```typescript
 {
-  subagent_type: "conversion-architect",
+  subagent_type: "product-ux-designer",
   description: "Design landing page",
   prompt: "Create design system for SaaS landing page targeting developers"
 }
@@ -122,7 +122,7 @@ Use multiple agents for complex workflows:
 ```typescript
 // 1. Design it
 {
-  subagent_type: "conversion-architect",
+  subagent_type: "product-ux-designer",
   description: "Design SaaS landing page",
   prompt: "Create design system for SaaS landing targeting technical decision-makers"
 }
@@ -261,7 +261,7 @@ Using the Task tool:
 | Agent | Type |
 |-------|------|
 | Sentinel | `sentinel` |
-| Conversion Architect | `conversion-architect` |
+| Conversion Architect | `product-ux-designer` |
 | Docs Engineer | `docs-engineer` |
 | Docs Architect | `docs-architect` |
 | Systems Thinker | `systems-thinker` |
@@ -311,7 +311,7 @@ Using the Task tool:
 ## Next Steps
 
 - [Sentinel (Morgan)](/docs/agents/sentinel) - Code review and security
-- [Conversion Architect (Avery)](/docs/agents/conversion-architect) - UX and growth
+- [Conversion Architect (Avery)](/docs/agents/product-ux-designer) - UX and growth
 - [Docs Engineer (Sam)](/docs/agents/docs-engineer) - Clear documentation
 - [Docs Architect (Emerson)](/docs/agents/docs-architect) - Beautiful docs
 - [Systems Thinker (Jan)](/docs/agents/systems-thinker) - Complex problems

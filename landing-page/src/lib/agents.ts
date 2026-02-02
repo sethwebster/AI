@@ -28,12 +28,12 @@ const AGENT_METADATA: Record<string, {
     borderColor: 'border-red-500/20',
     tagline: 'Your code\'s watchdog',
   },
-  'conversion-architect': {
+  'product-ux-designer': {
     icon: 'TrendingUp',
     color: 'from-purple-500 to-pink-500',
     bgColor: 'bg-purple-500/10',
     borderColor: 'border-purple-500/20',
-    tagline: 'Design psychology expert',
+    tagline: 'World-class product design',
   },
   'docs-engineer': {
     icon: 'FileText',
@@ -152,7 +152,7 @@ export async function getAgents(): Promise<Array<Agent & typeof AGENT_METADATA[s
   // Sort by a defined order
   const order = [
     'sentinel',
-    'conversion-architect',
+    'product-ux-designer',
     'docs-engineer',
     'docs-architect',
     'systems-thinker',
