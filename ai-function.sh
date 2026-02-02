@@ -72,7 +72,7 @@ EOF
 					echo "⚠️  Local clone is out of sync with remote"
 					echo "   This will delete $REPO_CLONE and re-clone fresh"
 					printf "Force reset? (y/N) "
-					read -r REPLY
+					read -r REPLY < /dev/tty
 					echo ""
 					if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 						echo "❌ Cancelled - local clone unchanged"
@@ -91,7 +91,7 @@ EOF
 				echo ""
 				echo "⚠️  AGENTS.md exists and is not a symlink"
 				printf "Replace with symlink? (y/N) "
-				read -r REPLY
+				read -r REPLY < /dev/tty
 				echo ""
 				if [[ $REPLY =~ ^[Yy]$ ]]; then
 					rm "AGENTS.md"
@@ -110,7 +110,7 @@ EOF
 				echo ""
 				echo "⚠️  CLAUDE.md exists and is not a symlink"
 				printf "Replace with symlink? (y/N) "
-				read -r REPLY
+				read -r REPLY < /dev/tty
 				echo ""
 				if [[ $REPLY =~ ^[Yy]$ ]]; then
 					rm "CLAUDE.md"
@@ -161,7 +161,7 @@ EOF
 				echo "⚠️  Local clone is out of sync with remote"
 				echo "   This will delete $REPO_CLONE and re-clone fresh"
 				printf "Force reset? (y/N) "
-				read -r REPLY
+				read -r REPLY < /dev/tty
 				echo ""
 				if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 					echo "❌ Cancelled - local clone unchanged"

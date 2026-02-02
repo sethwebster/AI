@@ -41,7 +41,7 @@ if grep -q "# AI Development CLI" "$SHELL_RC" 2>/dev/null; then
     echo ""
     echo "⚠️  AI function already installed in $SHELL_RC"
     printf "Reinstall? (y/N) "
-    read -r REPLY
+    read -r REPLY < /dev/tty
     echo ""
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo "❌ Installation cancelled"
