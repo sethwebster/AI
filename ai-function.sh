@@ -131,8 +131,11 @@ EOF
 			echo "   cat AGENTS.md"
 			echo "   cat AGENT-WORKSPACE.md"
 			echo ""
-			echo "🤖 Available agents:"
+			echo "🤖 Available agents (5 specialized agents):"
 			echo "   cat $REPO_CLONE/agents/README.md"
+			echo ""
+			echo "💡 To install agents into Claude Code or Codex:"
+			echo "   ai install agents"
 			echo ""
 			echo "🔗 Source: https://github.com/sethwebster/AI"
 			;;
