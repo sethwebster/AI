@@ -13,12 +13,15 @@ const TERMINAL_OUTPUT = [
   { text: "", delay: 1200 },
   { text: "Installed agents:", delay: 1400, color: "text-green-400" },
   { text: "  - Sentinel (Morgan)       Code review & security", delay: 1600, color: "text-cyan-400" },
-  { text: "  - Conversion Architect    UX & growth design", delay: 1800, color: "text-cyan-400" },
-  { text: "  - Docs Engineer (Sam)     Clear documentation", delay: 2000, color: "text-cyan-400" },
-  { text: "  - Docs Architect          Narrative docs", delay: 2200, color: "text-cyan-400" },
-  { text: "  - Systems Thinker (Jan)   Architecture", delay: 2400, color: "text-cyan-400" },
-  { text: "", delay: 2600 },
-  { text: "Run 'ai help' to get started", delay: 2800, color: "text-green-400" },
+  { text: "  - Conversion Architect    UX & growth design", delay: 1750, color: "text-cyan-400" },
+  { text: "  - Docs Engineer (Sam)     Clear documentation", delay: 1900, color: "text-cyan-400" },
+  { text: "  - Docs Architect          Narrative docs", delay: 2050, color: "text-cyan-400" },
+  { text: "  - Systems Thinker (Jan)   Architecture", delay: 2200, color: "text-cyan-400" },
+  { text: "  - Compiler Expert (Kai)   Parsing & optimization", delay: 2350, color: "text-cyan-400" },
+  { text: "  - Systems Engineer        Infrastructure & ops", delay: 2500, color: "text-cyan-400" },
+  { text: "  - Hardware Engineer       Firmware & circuits", delay: 2650, color: "text-cyan-400" },
+  { text: "", delay: 2800 },
+  { text: "Run 'ai help' to get started", delay: 3000, color: "text-green-400" },
 ]
 
 function useTypingAnimation(text: string, speed: number = 30, startDelay: number = 0) {

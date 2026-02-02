@@ -17,7 +17,7 @@ export async function getLatestRelease(): Promise<{ version: string; url: string
     if (!res.ok) {
       // Fallback for demo purposes or if repo is private/rate-limited
       console.warn(`Failed to fetch GitHub release: ${res.status} ${res.statusText}`);
-      return { version: "v2.0", url: "https://github.com/sethwebster/AI/releases" };
+      return { version: "v1.2.0", url: "https://github.com/sethwebster/AI/releases" };
     }
 
     const data: GitHubRelease = await res.json();
@@ -27,6 +27,6 @@ export async function getLatestRelease(): Promise<{ version: string; url: string
     };
   } catch (error) {
     console.warn("Error fetching GitHub release:", error);
-    return { version: "v2.0", url: "https://github.com/sethwebster/AI/releases" };
+    return { version: "v1.2.0", url: "https://github.com/sethwebster/AI/releases" };
   }
 }

@@ -58,7 +58,7 @@ export function Hero({ version, releaseUrl }: HeroProps) {
           transition={{ duration: 0.4, delay: 0.2 }}
           className="max-w-xl mx-auto text-lg md:text-xl text-zinc-400 mb-12"
         >
-          One command. Five specialized agents.
+          One command. Eight specialized agents.
           <br className="hidden sm:block" />
           Better code, faster.
         </motion.p>

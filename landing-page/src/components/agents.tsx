@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Shield, TrendingUp, FileText, BookOpen, Cpu } from "lucide-react"
+import { Shield, TrendingUp, FileText, BookOpen, Cpu, Layers, Server, Zap } from "lucide-react"
 
 const agents = [
   {
@@ -59,6 +59,39 @@ const agents = [
     borderColor: "border-amber-500/20",
     useCases: ["System design", "Complex bugs", "Architecture planning"],
   },
+  {
+    name: "Compiler Expert",
+    codename: "Kai",
+    tagline: "Language implementation specialist",
+    description: "Deep compiler and language implementation expertise. Parsing, optimization, code generation, and runtime systems.",
+    icon: Layers,
+    color: "from-indigo-500 to-purple-500",
+    bgColor: "bg-indigo-500/10",
+    borderColor: "border-indigo-500/20",
+    useCases: ["Compilers", "Parsers", "Type systems"],
+  },
+  {
+    name: "Systems Engineer",
+    codename: "Riley",
+    tagline: "Infrastructure & reliability",
+    description: "Infrastructure and distributed systems at scale. Kubernetes, CI/CD, monitoring, and operational excellence.",
+    icon: Server,
+    color: "from-blue-600 to-cyan-500",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/20",
+    useCases: ["K8s/Docker", "CI/CD", "Monitoring"],
+  },
+  {
+    name: "Hardware Engineer",
+    codename: "Quinn",
+    tagline: "Embedded & IoT specialist",
+    description: "Hardware and embedded systems expertise. Circuit design, firmware development, and hardware-software interfaces.",
+    icon: Zap,
+    color: "from-orange-500 to-red-500",
+    bgColor: "bg-orange-500/10",
+    borderColor: "border-orange-500/20",
+    useCases: ["Firmware", "IoT devices", "Embedded systems"],
+  },
 ]
 
 export function Agents() {
@@ -82,7 +115,7 @@ export function Agents() {
             transition={{ delay: 0.1 }}
             className="text-3xl md:text-5xl font-bold text-white mb-4"
           >
-            Five specialists. One command.
+            Eight specialists. One command.
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
