@@ -81,7 +81,8 @@ EOF
 			if [ -e "AGENTS.md" ] && [ ! -L "AGENTS.md" ]; then
 				echo ""
 				echo "⚠️  AGENTS.md exists and is not a symlink"
-				read -p "Replace with symlink? (y/N) " -n 1 -r
+				printf "Replace with symlink? (y/N) "
+				read -r REPLY
 				echo ""
 				if [[ $REPLY =~ ^[Yy]$ ]]; then
 					rm "AGENTS.md"
@@ -99,7 +100,8 @@ EOF
 			if [ -e "CLAUDE.md" ] && [ ! -L "CLAUDE.md" ]; then
 				echo ""
 				echo "⚠️  CLAUDE.md exists and is not a symlink"
-				read -p "Replace with symlink? (y/N) " -n 1 -r
+				printf "Replace with symlink? (y/N) "
+				read -r REPLY
 				echo ""
 				if [[ $REPLY =~ ^[Yy]$ ]]; then
 					rm "CLAUDE.md"
