@@ -1,5 +1,5 @@
 # AI Development CLI
-AI_VERSION="1.1.0"
+AI_VERSION="1.2.0"
 
 ai() {
 	local cmd="$1"
