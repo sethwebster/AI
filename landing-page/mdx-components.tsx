@@ -1,4 +1,5 @@
 import type { MDXComponents } from "mdx/types";
+import { CodeBlock } from "./src/components/docs/code-block";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -53,17 +54,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
           </code>
         );
       }
-      return (
-        <code className={`${className} text-zinc-100`}>
-          {children}
-        </code>
-      );
+      // Block code with syntax highlighting
+      return <CodeBlock className={className}>{String(children)}</CodeBlock>;
     },
-    pre: ({ children }: { children?: React.ReactNode }) => (
-      <pre className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 overflow-x-auto mb-6 text-sm text-zinc-100">
-        {children}
-      </pre>
-    ),
+    pre: ({ children }: { children?: React.ReactNode }) => {
+      // Pre is handled by CodeBlock, just return children
+      return <>{children}</>;
+    },
     blockquote: ({ children }) => (
       <blockquote className="border-l-4 border-cyan-500 pl-4 py-2 my-6 bg-cyan-500/5 text-zinc-300 italic">
         {children}
