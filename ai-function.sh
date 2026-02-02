@@ -203,7 +203,7 @@ EOF
 			echo "🔄 Updating ai function in $SHELL_RC..."
 
 			# Remove old function
-			sed -i.bak '/# AI Development CLI/,/^}$/d' "$SHELL_RC"
+			sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > "$SHELL_RC.tmp" && mv "$SHELL_RC.tmp" "$SHELL_RC"
 
 			# Add new function
 			cat "$REPO_CLONE/ai-function.sh" >> "$SHELL_RC"

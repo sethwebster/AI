@@ -51,7 +51,7 @@ if grep -q "# AI Development CLI" "$SHELL_RC" 2>/dev/null; then
 
     # Remove old installation
     echo "🗑️  Removing old installation..."
-    sed -i.bak '/# AI Development CLI/,/^}$/d' "$SHELL_RC"
+    sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > "$SHELL_RC.tmp" && mv "$SHELL_RC.tmp" "$SHELL_RC"
 fi
 
 echo "📝 Adding ai function to $SHELL_RC..."
