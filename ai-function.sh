@@ -309,8 +309,8 @@ EOF
 				echo "  ✅ Claude Code detected"
 			fi
 
-			# Detect Codex (placeholder - need to verify detection method)
-			if command -v codex &> /dev/null || [ -d "$HOME/.codex" ]; then
+			# Detect Codex
+			if command -v codex &> /dev/null; then
 				DETECTED_TOOLS+=("codex")
 				echo "  ✅ Codex detected"
 			fi
@@ -428,7 +428,55 @@ EOF
 						;;
 					codex)
 						echo "📦 Installing for Codex..."
-						echo "  ℹ️  Codex installation not yet implemented"
+						echo ""
+						echo "Choose installation scope:"
+						echo "  1. Project-scoped (.codex/skills/) - This repo only"
+						echo "  2. User-scoped (~/.codex/skills/) - All repos"
+						printf "Selection (1/2): "
+						read -r SCOPE < /dev/tty
+						echo ""
+
+						local SKILLS_DIR
+						if [ "$SCOPE" = "1" ]; then
+							SKILLS_DIR=".codex/skills"
+							echo "Installing to .codex/skills/ (project-scoped)..."
+						else
+							SKILLS_DIR="${CODEX_HOME:-$HOME/.codex}/skills"
+							echo "Installing to ${SKILLS_DIR} (user-scoped)..."
+						fi
+
+						mkdir -p "$SKILLS_DIR"
+
+						# Install selected agents as Codex skills
+						for agent_info in "${SELECTED_AGENTS[@]}"; do
+							local agent_type="${agent_info%%:*}"
+							local agent_name="${agent_info##*:}"
+							local source_file="$REPO_CLONE/agents/${agent_type}.md"
+							local skill_dir="$SKILLS_DIR/${agent_type}"
+							local dest_file="$skill_dir/SKILL.md"
+
+							if [ -f "$source_file" ]; then
+								mkdir -p "$skill_dir"
+
+								# Extract description (Role section)
+								local description=$(grep -A 1 "^## Role" "$source_file" | tail -1)
+
+								# Create Codex SKILL.md with frontmatter
+								cat > "$dest_file" <<EOF
+---
+name: ${agent_type}
+description: ${description}
+---
+
+EOF
+								# Append the rest of the markdown (skip first 5 lines)
+								tail -n +6 "$source_file" >> "$dest_file"
+
+								echo "  ✅ $agent_name"
+							else
+								echo "  ❌ $agent_name (source not found)"
+							fi
+						done
 						;;
 				esac
 			done
@@ -438,7 +486,18 @@ EOF
 			echo ""
 			echo "📖 Learn more: cat $REPO_CLONE/agents/README.md"
 			echo ""
-			echo "🔄 Restart Claude Code to load the new agents"
+
+			# Tool-specific restart instructions
+			for tool in "${DETECTED_TOOLS[@]}"; do
+				case "$tool" in
+					claude)
+						echo "🔄 Restart Claude Code to load the new agents"
+						;;
+					codex)
+						echo "🔄 Restart Codex or start a new session to load the new skills"
+						;;
+				esac
+			done
 			;;
 
 		*)
