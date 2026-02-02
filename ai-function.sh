@@ -64,27 +64,16 @@ EOF
 			local REPO_CLONE="$HOME/.ai-repo-local-clone"
 			local REPO_URL="https://github.com/sethwebster/AI.git"
 
-			# Clone or update the repo
+			# Always fetch fresh copy
 			if [ -d "$REPO_CLONE" ]; then
 				echo "📥 Updating local repo at $REPO_CLONE..."
-				if ! (cd "$REPO_CLONE" && git pull --depth 1); then
-					echo ""
-					echo "⚠️  Local clone is out of sync with remote"
-					echo "   This will delete $REPO_CLONE and re-clone fresh"
-					printf "Force reset? (y/N) "
-					read -r REPLY < /dev/tty
-					echo ""
-					if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-						echo "❌ Cancelled - local clone unchanged"
-						return 1
-					fi
-					rm -rf "$REPO_CLONE"
-					git clone --depth 1 "$REPO_URL" "$REPO_CLONE"
-				fi
+				rm -rf "$REPO_CLONE"
 			else
 				echo "📥 Cloning repo to $REPO_CLONE..."
-				git clone --depth 1 "$REPO_URL" "$REPO_CLONE"
 			fi
+
+			git clone --depth 1 "$REPO_URL" "$REPO_CLONE"
+			rm -rf "$REPO_CLONE/.git"
 
 			# Create symlinks for AGENTS.md
 			if [ -e "AGENTS.md" ] && [ ! -L "AGENTS.md" ]; then
@@ -170,23 +159,14 @@ EOF
 			fi
 
 			echo "🔄 Updating AI development best practices..."
-			if ! (cd "$REPO_CLONE" && git pull --depth 1); then
-				echo ""
-				echo "⚠️  Local clone is out of sync with remote"
-				echo "   This will delete $REPO_CLONE and re-clone fresh"
-				printf "Force reset? (y/N) "
-				read -r REPLY < /dev/tty
-				echo ""
-				if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-					echo "❌ Cancelled - local clone unchanged"
-					return 1
-				fi
-				rm -rf "$REPO_CLONE"
-				if ! git clone --depth 1 "$REPO_URL" "$REPO_CLONE"; then
-					echo "❌ Failed to clone repo"
-					return 1
-				fi
+			rm -rf "$REPO_CLONE"
+
+			if ! git clone --depth 1 "$REPO_URL" "$REPO_CLONE"; then
+				echo "❌ Failed to clone repo"
+				return 1
 			fi
+
+			rm -rf "$REPO_CLONE/.git"
 
 			echo "✅ Successfully updated local repo"
 			echo "   Symlinked files (AGENTS.md, CLAUDE.md) now reflect latest changes"
@@ -206,6 +186,15 @@ EOF
 					;;
 			esac
 
+			# Resolve symlink if needed
+			if [ -L "$SHELL_RC" ]; then
+				local ACTUAL_RC=$(readlink "$SHELL_RC")
+				if [[ "$ACTUAL_RC" != /* ]]; then
+					ACTUAL_RC="$(dirname "$SHELL_RC")/$ACTUAL_RC"
+				fi
+				SHELL_RC="$ACTUAL_RC"
+			fi
+
 			# Check if ai function is installed
 			if ! grep -q "# AI Development CLI" "$SHELL_RC" 2>/dev/null; then
 				echo "⚠️  AI function not found in $SHELL_RC"
@@ -216,8 +205,11 @@ EOF
 			echo ""
 			echo "🔄 Updating ai function in $SHELL_RC..."
 
-			# Remove old function
-			sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > "$SHELL_RC.tmp" && mv "$SHELL_RC.tmp" "$SHELL_RC"
+			# Remove old function using temp file
+			sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > /tmp/shell_rc_temp
+			chmod --reference="$SHELL_RC" /tmp/shell_rc_temp 2>/dev/null || chmod 644 /tmp/shell_rc_temp
+			cat /tmp/shell_rc_temp > "$SHELL_RC"
+			rm /tmp/shell_rc_temp
 
 			# Add new function
 			cat "$REPO_CLONE/ai-function.sh" >> "$SHELL_RC"
