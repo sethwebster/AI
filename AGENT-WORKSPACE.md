@@ -15,39 +15,41 @@ When you start working in this workspace:
 
 ### Repository Information
 
-- **Repository**: [Your project name]
-- **Primary Language**: [e.g., TypeScript, Elixir, Python]
-- **Framework**: [e.g., Next.js, Phoenix, Django]
-- **Package Manager**: [e.g., npm, bun, mix, pip]
+- **Repository**: AI CLI + agent guidelines + docs site
+- **Primary Language**: Bash (CLI), JavaScript/TypeScript (installer + landing page)
+- **Framework**: Next.js (landing page in `landing-page/`)
+- **Package Manager**: npm
 
 ### Key Directories
 
 ```
 .
-├── src/              # Source code
-├── tests/            # Test files
-├── docs/             # Documentation
-├── adr/              # Architecture Decision Records
-└── .changeset/       # Changesets for versioning
+├── agents/           # Agent definition markdown files
+├── bin/              # npm installer script
+├── landing-page/     # Next.js documentation site (MDX)
+├── migrations/       # CLI migration scripts
+├── ai-function.sh    # Shell function that powers `ai` CLI
+└── install.sh        # Curl-based installer
 ```
 
 ### Development Commands
 
 ```bash
-# Install dependencies
-[command]
+# Install CLI package deps (root)
+npm install
 
-# Run development server
-[command]
+# Run landing page dev server
+cd landing-page
+npm install
+npm run dev
 
-# Run tests
-[command]
+# Lint landing page
+cd landing-page
+npm run lint
 
-# Run linter
-[command]
-
-# Build production
-[command]
+# Build landing page
+cd landing-page
+npm run build
 ```
 
 ## ⚠️ CRITICAL: Migration Requirements
@@ -119,54 +121,55 @@ migration_down() {
 
 ### Tech Stack
 
-- **Frontend**: [Framework/library]
-- **Backend**: [Framework/library]
-- **Database**: [Database]
-- **Caching**: [Redis/other]
-- **Testing**: [Testing framework]
+- **Frontend**: Next.js App Router + MDX (`landing-page/`)
+- **Backend**: None (CLI + static docs)
+- **Database**: None
+- **Caching**: None
+- **Testing**: No automated test suite in repo; landing page uses ESLint
 
 ### Environment Setup
 
 Required environment variables:
-- `DATABASE_URL` - Database connection string
-- `REDIS_URL` - Redis connection string
-- [Add others as needed]
+- None documented in repo
 
 ### Testing Strategy
 
-- Unit tests: [Location and conventions]
-- Integration tests: [Location and conventions]
-- E2E tests: [Location and conventions]
+- Unit tests: None
+- Integration tests: None
+- E2E tests: None
 
 ### Deployment
 
-- **Staging**: [URL or process]
-- **Production**: [URL or process]
-- **CI/CD**: [Platform - GitHub Actions, etc.]
+- **Staging**: Not documented
+- **Production**: Not documented (landing page is a standard Next.js app)
+- **CI/CD**: Not documented
 
 ## Current Work
 
 ### Active Features
 
-[List current features being developed]
+- None noted in repo
 
 ### Known Issues
 
-[List known bugs or technical debt]
+- None documented
 
 ### Upcoming Work
 
-[List planned features or refactoring]
+- None documented
 
 ## Important Patterns
 
-### [Pattern 1]
+### CLI Version Sync
 
-[Describe project-specific pattern]
+Keep versions synchronized across:
+- `package.json` version
+- `ai-function.sh` `AI_VERSION`
+- Git tag `vX.Y.Z` (see `PUBLISHING.md`)
 
-### [Pattern 2]
+### Migrations For Installed Changes
 
-[Describe project-specific pattern]
+Any change that affects installed agents/skills or configuration requires a migration in `migrations/` (see `migrations/README.md`). Always implement idempotent `migration_up()` and `migration_down()` and test both directions.
 
 ## Troubleshooting
 
