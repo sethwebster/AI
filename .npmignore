@@ -1,0 +1,23 @@
+# Git
+.git/
+.gitignore
+
+# Claude
+.claude/
+
+# Documentation site (published separately)
+landing-page/
+
+# Development files
+.DS_Store
+*.log
+node_modules/
+
+# Keep only what's needed for installation
+!bin/
+!agents/
+!ai-function.sh
+!install.sh
+!README.md
+!AGENTS.md
+!LICENSE

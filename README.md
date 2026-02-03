@@ -25,10 +25,16 @@ Reference materials and configurations for building production AI systems.
 
 ### Quick Install (Recommended)
 
-Install the `ai` CLI tool with one command:
+Install via npx (no download required):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/install.sh | bash
+npx @sethwebster/ai-cli
+```
+
+Or install globally via npm:
+
+```bash
+npm install -g @sethwebster/ai-cli
 ```
 
 Then reload your shell and initialize your project:
@@ -36,6 +42,14 @@ Then reload your shell and initialize your project:
 ```bash
 source ~/.zshrc  # or ~/.bashrc for bash
 ai init
+```
+
+### Alternative: Direct Install
+
+Install with curl (no Node.js required):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/install.sh | bash
 ```
 
 ### Manual Installation
@@ -57,10 +71,16 @@ ai init
 
 ```
 AI/
+├── agents/              # Agent definitions
+├── bin/
+│   └── install.js       # npm installer script
+├── landing-page/        # Documentation website
+├── migrations/          # Migration system
 ├── AGENTS.md            # Agent dev guidelines
 ├── AGENT-WORKSPACE.md   # Workspace template
 ├── ai-function.sh       # Shell function definition
 ├── install.sh           # Installer script
+├── package.json         # npm package config
 └── README.md            # This file
 ```
 

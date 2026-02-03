@@ -1,0 +1,44 @@
+{
+  "name": "@sethwebster/ai-cli",
+  "version": "1.2.0",
+  "description": "AI Development CLI with specialized agents for Claude Code and Codex",
+  "bin": {
+    "ai-install": "./bin/install.js"
+  },
+  "scripts": {
+    "postinstall": "node ./bin/install.js"
+  },
+  "keywords": [
+    "ai",
+    "cli",
+    "claude",
+    "codex",
+    "development",
+    "agents",
+    "code-review",
+    "documentation",
+    "design"
+  ],
+  "author": "Seth Webster",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sethwebster/AI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sethwebster/AI/issues"
+  },
+  "homepage": "https://github.com/sethwebster/AI#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "bin/",
+    "ai-function.sh",
+    "install.sh",
+    "agents/",
+    "README.md",
+    "AGENTS.md",
+    "LICENSE"
+  ]
+}
