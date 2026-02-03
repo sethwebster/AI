@@ -56,11 +56,13 @@ jobs:
 
       - name: Verify published package
         run: |
-          sleep 5  # Wait for npm to update
+          echo "Waiting for npm registry to update..."
+          sleep 15  # Wait for npm to propagate
           PUBLISHED_VERSION=$(npm view @sethwebster/ai-cli version)
           echo "✅ Published version: $PUBLISHED_VERSION"
 
           if [ "$PUBLISHED_VERSION" != "${{ steps.version.outputs.version }}" ]; then
             echo "⚠️  Published version doesn't match tag"
+            echo "   This may be a registry propagation delay"
             exit 1
           fi
