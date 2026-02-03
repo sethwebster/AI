@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, Copy } from "lucide-react"
 
-const INSTALL_COMMAND = "curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/install.sh | bash"
+const INSTALL_COMMAND = "npx @sethwebster/ai-cli"
 
 const TERMINAL_OUTPUT = [
   { text: "", delay: 0 },
@@ -13,7 +13,7 @@ const TERMINAL_OUTPUT = [
   { text: "", delay: 1200 },
   { text: "Installed agents:", delay: 1400, color: "text-green-400" },
   { text: "  - Sentinel (Morgan)       Code review & security", delay: 1600, color: "text-cyan-400" },
-  { text: "  - Conversion Architect    UX & growth design", delay: 1750, color: "text-cyan-400" },
+  { text: "  - Product/UX Designer     User-centered design", delay: 1750, color: "text-cyan-400" },
   { text: "  - Docs Engineer (Sam)     Clear documentation", delay: 1900, color: "text-cyan-400" },
   { text: "  - Docs Architect          Narrative docs", delay: 2050, color: "text-cyan-400" },
   { text: "  - Systems Thinker (Jan)   Architecture", delay: 2200, color: "text-cyan-400" },
