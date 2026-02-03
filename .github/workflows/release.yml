@@ -1,0 +1,97 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for changelog
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get previous tag
+        id: previous_tag
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          echo "Previous tag: $PREVIOUS_TAG"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -z "${{ steps.previous_tag.outputs.previous_tag }}" ]; then
+            echo "No previous tag found, showing recent commits"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" -10)
+          else
+            echo "Generating changelog from ${{ steps.previous_tag.outputs.previous_tag }} to ${{ steps.version.outputs.tag }}"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${{ steps.previous_tag.outputs.previous_tag }}..${{ steps.version.outputs.tag }})
+          fi
+
+          # Save to file to handle multiline
+          echo "$CHANGELOG" > changelog.txt
+
+      - name: Create release notes
+        run: |
+          cat > release_notes.md << 'EOF'
+          ## Installation
+
+          ```bash
+          npx @sethwebster/ai-cli
+          ```
+
+          Or install globally:
+
+          ```bash
+          npm install -g @sethwebster/ai-cli@${{ steps.version.outputs.version }}
+          ```
+
+          ## What's Changed
+
+          EOF
+
+          cat changelog.txt >> release_notes.md
+
+          cat >> release_notes.md << 'EOF'
+
+          ## Package Info
+
+          - **npm**: https://www.npmjs.com/package/@sethwebster/ai-cli/v/${{ steps.version.outputs.version }}
+          - **Size**: Run `npm pack --dry-run` to see package contents
+
+          ## Agents Included
+
+          - Sentinel (Morgan) - Code review & security
+          - Product/UX Designer (Avery) - User-centered design
+          - Docs Engineer (Sam) - Clear documentation
+          - Docs Architect (Emerson) - Beautiful documentation
+          - Systems Thinker (Jan) - Deep problem solving
+          - Compiler Expert (Kai) - Parsing & optimization
+          - Systems Engineer (Riley) - Infrastructure & ops
+          - Hardware Engineer (Quinn) - Firmware & circuits
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
