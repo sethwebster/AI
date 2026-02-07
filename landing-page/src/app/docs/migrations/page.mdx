@@ -138,7 +138,7 @@ ai migrate down
 
 ### Example: Renaming an Agent
 
-**Scenario:** Agent `neckbeard-code-reviewer` renamed to `sentinel`.
+**Scenario:** Agent `legacy-code-reviewer` renamed to `sentinel`.
 
 **Migration:**
 
@@ -155,19 +155,19 @@ migration_up() {
   echo "  → Renaming agents..."
 
   # Claude Code (project-level)
-  if [ -f ".claude/agents/neckbeard-code-reviewer.md" ]; then
-    mv ".claude/agents/neckbeard-code-reviewer.md" \
+  if [ -f ".claude/agents/legacy-code-reviewer.md" ]; then
+    mv ".claude/agents/legacy-code-reviewer.md" \
        ".claude/agents/sentinel.md"
-    sed -i 's/^name: neckbeard-code-reviewer/name: sentinel/' \
+    sed -i 's/^name: legacy-code-reviewer/name: sentinel/' \
         ".claude/agents/sentinel.md"
     ((CHANGED++))
   fi
 
   # Claude Code (user-level)
-  if [ -f "$HOME/.claude/agents/neckbeard-code-reviewer.md" ]; then
-    mv "$HOME/.claude/agents/neckbeard-code-reviewer.md" \
+  if [ -f "$HOME/.claude/agents/legacy-code-reviewer.md" ]; then
+    mv "$HOME/.claude/agents/legacy-code-reviewer.md" \
        "$HOME/.claude/agents/sentinel.md"
-    sed -i 's/^name: neckbeard-code-reviewer/name: sentinel/' \
+    sed -i 's/^name: legacy-code-reviewer/name: sentinel/' \
         "$HOME/.claude/agents/sentinel.md"
     ((CHANGED++))
   fi
@@ -187,17 +187,17 @@ migration_down() {
   # Reverse the changes
   if [ -f ".claude/agents/sentinel.md" ]; then
     mv ".claude/agents/sentinel.md" \
-       ".claude/agents/neckbeard-code-reviewer.md"
-    sed -i 's/^name: sentinel/name: neckbeard-code-reviewer/' \
-        ".claude/agents/neckbeard-code-reviewer.md"
+       ".claude/agents/legacy-code-reviewer.md"
+    sed -i 's/^name: sentinel/name: legacy-code-reviewer/' \
+        ".claude/agents/legacy-code-reviewer.md"
     ((CHANGED++))
   fi
 
   if [ -f "$HOME/.claude/agents/sentinel.md" ]; then
     mv "$HOME/.claude/agents/sentinel.md" \
-       "$HOME/.claude/agents/neckbeard-code-reviewer.md"
-    sed -i 's/^name: sentinel/name: neckbeard-code-reviewer/' \
-        "$HOME/.claude/agents/neckbeard-code-reviewer.md"
+       "$HOME/.claude/agents/legacy-code-reviewer.md"
+    sed -i 's/^name: sentinel/name: legacy-code-reviewer/' \
+        "$HOME/.claude/agents/legacy-code-reviewer.md"
     ((CHANGED++))
   fi
 

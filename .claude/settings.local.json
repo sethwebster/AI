@@ -29,7 +29,14 @@
       "Bash(ai version:*)",
       "Bash(npm install:*)",
       "Bash(git mv:*)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(gh secret:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh release view:*)",
+      "Bash(npx @sethwebster/ai-cli@1.2.1:*)",
+      "Bash(npx ai-cli@1.2.1)",
+      "Bash(timeout 10 npx:*)"
     ]
   }
 }

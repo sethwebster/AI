@@ -11,8 +11,8 @@ migration_up() {
 
 	# Claude Code agents
 	if [ -d "$HOME/.claude/agents" ]; then
-		if [ -f "$HOME/.claude/agents/neckbeard-code-reviewer.md" ]; then
-			mv "$HOME/.claude/agents/neckbeard-code-reviewer.md" "$HOME/.claude/agents/sentinel.md" 2>/dev/null && ((CHANGED++))
+		if [ -f "$HOME/.claude/agents/legacy-code-reviewer.md" ]; then
+			mv "$HOME/.claude/agents/legacy-code-reviewer.md" "$HOME/.claude/agents/sentinel.md" 2>/dev/null && ((CHANGED++))
 		fi
 		if [ -f "$HOME/.claude/agents/design-visionary.md" ]; then
 			mv "$HOME/.claude/agents/design-visionary.md" "$HOME/.claude/agents/conversion-architect.md" 2>/dev/null && ((CHANGED++))
@@ -31,8 +31,8 @@ migration_up() {
 	# Codex skills
 	local CODEX_SKILLS="${CODEX_HOME:-$HOME/.codex}/skills"
 	if [ -d "$CODEX_SKILLS" ]; then
-		if [ -d "$CODEX_SKILLS/neckbeard-code-reviewer" ]; then
-			mv "$CODEX_SKILLS/neckbeard-code-reviewer" "$CODEX_SKILLS/sentinel" 2>/dev/null && ((CHANGED++))
+		if [ -d "$CODEX_SKILLS/legacy-code-reviewer" ]; then
+			mv "$CODEX_SKILLS/legacy-code-reviewer" "$CODEX_SKILLS/sentinel" 2>/dev/null && ((CHANGED++))
 		fi
 		if [ -d "$CODEX_SKILLS/design-visionary" ]; then
 			mv "$CODEX_SKILLS/design-visionary" "$CODEX_SKILLS/conversion-architect" 2>/dev/null && ((CHANGED++))
@@ -82,7 +82,7 @@ migration_down() {
 	# Claude Code agents
 	if [ -d "$HOME/.claude/agents" ]; then
 		if [ -f "$HOME/.claude/agents/sentinel.md" ]; then
-			mv "$HOME/.claude/agents/sentinel.md" "$HOME/.claude/agents/neckbeard-code-reviewer.md" 2>/dev/null && ((CHANGED++))
+			mv "$HOME/.claude/agents/sentinel.md" "$HOME/.claude/agents/legacy-code-reviewer.md" 2>/dev/null && ((CHANGED++))
 		fi
 		if [ -f "$HOME/.claude/agents/conversion-architect.md" ]; then
 			mv "$HOME/.claude/agents/conversion-architect.md" "$HOME/.claude/agents/design-visionary.md" 2>/dev/null && ((CHANGED++))
@@ -102,7 +102,7 @@ migration_down() {
 	local CODEX_SKILLS="${CODEX_HOME:-$HOME/.codex}/skills"
 	if [ -d "$CODEX_SKILLS" ]; then
 		if [ -d "$CODEX_SKILLS/sentinel" ]; then
-			mv "$CODEX_SKILLS/sentinel" "$CODEX_SKILLS/neckbeard-code-reviewer" 2>/dev/null && ((CHANGED++))
+			mv "$CODEX_SKILLS/sentinel" "$CODEX_SKILLS/legacy-code-reviewer" 2>/dev/null && ((CHANGED++))
 		fi
 		if [ -d "$CODEX_SKILLS/conversion-architect" ]; then
 			mv "$CODEX_SKILLS/conversion-architect" "$CODEX_SKILLS/design-visionary" 2>/dev/null && ((CHANGED++))
@@ -120,7 +120,7 @@ migration_down() {
 
 	# Update frontmatter in renamed files
 	if [ -d "$HOME/.claude/agents" ]; then
-		for agent in neckbeard-code-reviewer design-visionary docs-artisan technical-docs-artist e6-problem-solver; do
+		for agent in legacy-code-reviewer design-visionary docs-artisan technical-docs-artist e6-problem-solver; do
 			local file="$HOME/.claude/agents/${agent}.md"
 			if [ -f "$file" ]; then
 				sed -i.bak "s/^name: .*/name: ${agent}/" "$file" 2>/dev/null && rm -f "${file}.bak"
@@ -129,7 +129,7 @@ migration_down() {
 	fi
 
 	if [ -d "$CODEX_SKILLS" ]; then
-		for skill in neckbeard-code-reviewer design-visionary docs-artisan technical-docs-artist e6-problem-solver; do
+		for skill in legacy-code-reviewer design-visionary docs-artisan technical-docs-artist e6-problem-solver; do
 			local file="$CODEX_SKILLS/${skill}/SKILL.md"
 			if [ -f "$file" ]; then
 				sed -i.bak "s/^name: .*/name: ${skill}/" "$file" 2>/dev/null && rm -f "${file}.bak"

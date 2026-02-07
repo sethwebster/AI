@@ -98,7 +98,7 @@ All standard tools (Read, Write, Edit, Grep, Glob, Bash, etc.)
 - Simple, well-defined tasks (use general agent)
 - Pure implementation work (use general agent or specialized agent)
 - Documentation only (use docs-artisan or technical-docs-artist)
-- Code review only (use neckbeard-code-reviewer)
+- Code review only (use sentinel)
 - Design only (use design-visionary)
 
 ## Best Practices

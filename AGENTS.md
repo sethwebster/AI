@@ -4,6 +4,21 @@
 
 Enterprise-grade guidelines for building production systems with AI agents.
 
+## Available Agents (Template)
+
+Use these agent names when invoking specialized subagents:
+
+- `sentinel` — Tech lead reviewer for security, architecture, and edge cases
+- `product-ux-designer` — Product/UX design and interface excellence
+- `docs-engineer` — Implementation-grade documentation
+- `docs-architect` — Narrative, high-polish documentation
+- `systems-thinker` — Complex systems reasoning and architectural design
+- `compiler-expert` — Parsers, compilers, ASTs, and optimization
+- `systems-engineer` — Infrastructure, reliability, and operations
+- `hardware-engineer` — Embedded systems and hardware/firmware
+
+See `agents/README.md` for full descriptions and usage examples.
+
 ## Core Principles
 
 ### 1. Explicit Over Implicit
