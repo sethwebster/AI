@@ -246,15 +246,79 @@ async function waitForAgents(names: string[]) {
     const statuses = await Promise.all(
       names.map(name => checkAgentStatus(name))
     )
-    
+
     if (statuses.every(s => s.status === 'completed' || s.status === 'failed')) {
       return statuses
     }
-    
+
     await sleep(5000) // Check every 5 seconds
   }
 }
 ```
+
+### Agent Learnings (REQUIRED)
+
+**CRITICAL**: All agents MUST maintain `./agent/LEARNINGS.md` to capture cumulative knowledge about the user and workspace.
+
+**Purpose**:
+- Build institutional knowledge across sessions
+- Avoid repeating mistakes or redundant questions
+- Understand user preferences and workspace conventions
+- Track important discoveries about codebase architecture
+
+**What to Capture**:
+- User preferences (communication style, tooling choices, workflow habits)
+- Workspace conventions (naming patterns, file organization, testing approach)
+- Architecture insights (key design decisions, integration patterns)
+- Pitfalls discovered (bugs found, antipatterns identified)
+- Domain knowledge (business logic, user flows, data models)
+
+**What NOT to Capture**:
+- Session-specific tasks or temporary state
+- Information already documented in README/CLAUDE.md
+- Speculative or unverified conclusions
+- Sensitive information (credentials, API keys, PII)
+
+**Format**:
+```markdown
+# Agent Learnings
+
+Last updated: YYYY-MM-DD
+
+## User Preferences
+- Prefers concise communication, minimal grammar
+- Uses `bun` instead of `npm`
+- Always runs tests before committing
+
+## Workspace Conventions
+- Feature branches prefixed with `seth/`
+- Server components for data fetching, client components only for interactivity
+- Custom hooks instead of direct `useEffect` usage
+
+## Architecture Insights
+- API routes use Expo Router with EAS Hosting
+- Database uses Prisma migrations (NEVER `db push`)
+- Caching strategy uses `unstable_cache()` for persistence
+
+## Known Pitfalls
+- Date serialization must happen inside cache functions
+- Async page components cause full-page suspense
+- Always commit migration files with schema changes
+
+## Domain Knowledge
+- [Project-specific business logic and flows]
+```
+
+**Update Frequency**:
+- Update IMMEDIATELY when discovering new user preferences
+- Update when identifying new workspace conventions
+- Update after significant architecture discussions
+- Review and consolidate weekly to prevent bloat
+
+**File Location**:
+- Path: `./agent/LEARNINGS.md`
+- Create directory if it doesn't exist
+- Keep file under 500 lines (archive old learnings if needed)
 
 ## Feature Development Process
 
