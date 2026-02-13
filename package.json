@@ -2,7 +2,9 @@
   "name": "@sethwebster/ai-cli",
   "version": "1.3.0",
   "description": "AI Development CLI with specialized agents for Claude Code and Codex",
-  "bin": "bin/install.js",
+  "bin": {
+    "ai-cli": "bin/install.js"
+  },
   "scripts": {
     "postinstall": "node ./bin/install.js",
     "check:versions": "node ./scripts/check-versions.js",
