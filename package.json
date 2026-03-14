@@ -1,6 +1,6 @@
 {
   "name": "@sethwebster/ai-cli",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "AI Development CLI with specialized agents for Claude Code and Codex",
   "bin": {
     "ai-cli": "bin/install.js"
@@ -42,6 +42,7 @@
     "ai-function.sh",
     "install.sh",
     "agents/",
+    "skills/",
     "README.md",
     "AGENTS.md",
     "LICENSE"

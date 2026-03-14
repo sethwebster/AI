@@ -1,5 +1,5 @@
 # AI Development CLI
-AI_VERSION="1.3.1"
+AI_VERSION="1.4.0"
 
 ai() {
 	local cmd="$1"
@@ -252,6 +252,30 @@ ai() {
 		echo ""
 	}
 
+	# Refresh marketplace cache (re-clones if stale >1h or forced)
+	_ai_marketplace_cache_update() {
+		local force="${1:-}"
+		local cache="$HOME/.ai-marketplace-cache"
+		local repo="https://github.com/sethwebster/ai-marketplace.git"
+
+		if [ -d "$cache" ] && [ -z "$force" ]; then
+			local now mtime age
+			now=$(date +%s)
+			mtime=$(stat -f %m "$cache" 2>/dev/null || stat -c %Y "$cache" 2>/dev/null || echo 0)
+			age=$(( now - mtime ))
+			[ "$age" -lt 3600 ] && return 0
+		fi
+
+		echo -e "  ${GRAY}Refreshing marketplace...${RESET}"
+		rm -rf "$cache"
+		if git clone --depth 1 "$repo" "$cache" 2>/dev/null; then
+			rm -rf "$cache/.git"
+		else
+			_ai_warn "Could not fetch marketplace (offline?)"
+			return 1
+		fi
+	}
+
 	# ═══════════════════════════════════════════════════════════════════════════
 	# DIRECTORY REGISTRY HELPERS
 	# ═══════════════════════════════════════════════════════════════════════════
@@ -374,14 +398,29 @@ ai() {
 
 			_ai_register_directory
 
+			# Register marketplace
+			echo ""
+			echo -e "${CYAN}${SYM_SPARK}${RESET} ${BOLD}${WHITE}Setting up marketplace${RESET}"
+			echo ""
+			if claude plugin marketplace list 2>/dev/null | grep -q "ai-marketplace"; then
+				_ai_info "ai-marketplace already registered"
+			else
+				if claude plugin marketplace add sethwebster/ai-marketplace 2>/dev/null; then
+					_ai_success "ai-marketplace registered"
+				else
+					_ai_warn "Could not register marketplace (is claude installed?)"
+				fi
+			fi
+
 			# Next steps
 			echo ""
 			echo -e "${GRAY_DARK}$(printf '%0.s─' $(seq 1 50))${RESET}"
 			echo ""
 			echo -e "${CYAN}${SYM_SPARK}${RESET} ${BOLD}${WHITE}Next steps${RESET}"
 			echo ""
-			_ai_cmd_hint "cat AGENTS.md" "Review agent guidelines"
-			_ai_cmd_hint "ai install agents" "Install agents to Claude/Codex"
+			_ai_cmd_hint "ai agents install" "Install agents from marketplace"
+			_ai_cmd_hint "ai mcp install" "Install MCP servers"
+			_ai_cmd_hint "ai plugins install <name>" "Install Claude Code plugins"
 			_ai_cmd_hint "ai update" "Keep everything up to date"
 			echo ""
 			echo -e "${GRAY_DIM}Source: ${CYAN}github.com/sethwebster/AI${RESET}"
@@ -453,10 +492,14 @@ ai() {
 			echo ""
 
 			# Remove old function using temp file
-			sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > /tmp/shell_rc_temp
-			chmod --reference="$SHELL_RC" /tmp/shell_rc_temp 2>/dev/null || chmod 644 /tmp/shell_rc_temp
-			cat /tmp/shell_rc_temp > "$SHELL_RC"
-			rm /tmp/shell_rc_temp
+			local backup="${SHELL_RC}.ai-backup-$(date +%s)"
+			cp "$SHELL_RC" "$backup"
+			local tmp
+			tmp=$(mktemp) || { _ai_error "Could not create temp file"; return 1; }
+			sed '/# AI Development CLI/,/^}$/d' "$SHELL_RC" > "$tmp"
+			chmod --reference="$SHELL_RC" "$tmp" 2>/dev/null || chmod 644 "$tmp"
+			mv "$tmp" "$SHELL_RC"
+			_ai_info "Backup saved: $backup"
 
 			# Add new function
 			cat "$REPO_CLONE/ai-function.sh" >> "$SHELL_RC"
@@ -472,9 +515,26 @@ ai() {
 			# Run migrations
 			if [ -d "$REPO_CLONE/migrations" ]; then
 				echo -e "${CYAN}${SYM_SPARK}${RESET} ${BOLD}${WHITE}Checking migrations${RESET}"
-				source "$SHELL_RC"
+				# Source only the ai function, not the full RC, to avoid side effects
+				source "$REPO_CLONE/ai-function.sh"
 				ai migrate up
 			fi
+
+			# Update marketplace
+			echo -e "${CYAN}${SYM_SPARK}${RESET} ${BOLD}${WHITE}Updating marketplace${RESET}"
+			echo ""
+			if claude plugin marketplace list 2>/dev/null | grep -q "ai-marketplace"; then
+				if claude plugin marketplace update ai-marketplace 2>/dev/null; then
+					_ai_success "Plugins updated"
+				else
+					_ai_warn "Plugin update failed"
+				fi
+			else
+				_ai_warn "ai-marketplace not registered — run 'ai init'"
+			fi
+			_ai_marketplace_cache_update "force"
+			_ai_success "Marketplace cache refreshed"
+			echo ""
 			;;
 
 		update-all)
@@ -623,6 +683,8 @@ ai() {
 
 						echo -e "  ${CYAN}${SYM_ARROW}${RESET} ${WHITE}${migration_id}${RESET}"
 
+						# TRUST BOUNDARY: migration files execute arbitrary shell code as the current user.
+						# Only run ai migrate if you trust the AI repo owner's push access (github.com/sethwebster/AI).
 						source "$migration_file"
 
 						if migration_up; then
@@ -722,16 +784,422 @@ ai() {
 			esac
 			;;
 
+	agents)
+		local subcmd="${1:-list}"
+		shift 2>/dev/null || true
+		local cache="$HOME/.ai-marketplace-cache"
+
+		case "$subcmd" in
+			list)
+				_ai_marketplace_cache_update || { _ai_error "Could not reach marketplace"; return 1; }
+				echo ""
+				_ai_section "Marketplace Agents"
+				echo ""
+				local agents_dir="$cache/agents"
+				if [ ! -d "$agents_dir" ] || [ -z "$(ls "$agents_dir"/*.md 2>/dev/null)" ]; then
+					_ai_info "No agents in marketplace"
+					echo ""
+					return 0
+				fi
+				local installed_dir="$HOME/.claude/agents"
+				for f in "$agents_dir"/*.md; do
+					[ -f "$f" ] || continue
+					local aname adesc installed_mark=""
+					aname=$(grep '^name:' "$f" | head -1 | sed 's/name:[[:space:]]*//')
+					adesc=$(grep '^description:' "$f" | head -1 | sed 's/description:[[:space:]]*//' | cut -c1-70)
+					[ -f "$installed_dir/${aname}.md" ] && installed_mark=" ${GREEN}${SYM_CHECK} installed${RESET}"
+					echo -e "  ${CYAN}${SYM_DOT}${RESET} ${BOLD}${WHITE}${aname}${RESET}${installed_mark}"
+					echo -e "     ${GRAY}${adesc}${RESET}"
+					echo ""
+				done
+				_ai_cmd_hint "ai agents install [name]" "Install an agent"
+				echo ""
+				;;
+
+			install)
+				_ai_marketplace_cache_update || { _ai_error "Could not reach marketplace"; return 1; }
+				if ! command -v claude &>/dev/null && [ ! -d "$HOME/.claude" ]; then
+					_ai_error "claude CLI not found — install Claude Code first"
+					return 1
+				fi
+				local agent_name="${1:-}"
+				local agents_dir="$cache/agents"
+
+				if [ ! -d "$agents_dir" ]; then
+					_ai_error "No agents found in marketplace"
+					return 1
+				fi
+
+				local -a AVAILABLE=()
+				local i=1
+				echo ""
+				_ai_section "Available Agents"
+				echo ""
+				for f in "$agents_dir"/*.md; do
+					[ -f "$f" ] || continue
+					local aname adesc
+					aname=$(grep '^name:' "$f" | head -1 | sed 's/name:[[:space:]]*//')
+					adesc=$(grep '^description:' "$f" | head -1 | sed 's/description:[[:space:]]*//' | cut -c1-60)
+					AVAILABLE+=("$(basename "$f" .md)"$'\x01'"$aname"$'\x01'"$adesc")
+					echo -e "  ${WHITE}${i}.${RESET} ${CYAN}${aname}${RESET}"
+					echo -e "     ${GRAY}${adesc}${RESET}"
+					echo ""
+					((i++))
+				done
+
+				if [ ${#AVAILABLE[@]} -eq 0 ]; then
+					_ai_info "No agents available"
+					return 0
+				fi
+
+				local selection=""
+				if [ -n "$agent_name" ]; then
+					for entry in "${AVAILABLE[@]}"; do
+						IFS=$'\x01' read -r file aname adesc <<< "$entry"
+						if [ "$file" = "$agent_name" ] || [ "$aname" = "$agent_name" ]; then
+							selection="$file"
+							break
+						fi
+					done
+					[ -z "$selection" ] && { _ai_error "Agent not found: $agent_name"; return 1; }
+				else
+					printf "  ${WHITE}Select${RESET} ${GRAY_DIM}(number)${RESET}: "
+					read -r sel < /dev/tty
+					if [[ "$sel" =~ ^[0-9]+$ ]] && [ "$sel" -ge 1 ] && [ "$sel" -le ${#AVAILABLE[@]} ]; then
+						IFS=$'\x01' read -r selection _ _ <<< "${AVAILABLE[$((sel - 1))]}"
+					else
+						_ai_error "Invalid selection"; return 1
+					fi
+				fi
+
+				echo ""
+				echo -e "  ${WHITE}1${RESET}  Project-level ${GRAY_DIM}.claude/agents/${RESET} ${GRAY}(shared via git)${RESET}"
+				echo -e "  ${WHITE}2${RESET}  User-level ${GRAY_DIM}~/.claude/agents/${RESET} ${GRAY}(personal, all projects)${RESET}"
+				echo ""
+				printf "  ${WHITE}Scope${RESET} ${GRAY_DIM}(1/2, default 2)${RESET}: "
+				read -r scope < /dev/tty
+				echo ""
+
+				local agent_dir
+				[ "$scope" = "1" ] && agent_dir=".claude/agents" || agent_dir="$HOME/.claude/agents"
+				mkdir -p "$agent_dir"
+
+				cp "$agents_dir/${selection}.md" "$agent_dir/${selection}.md"
+				_ai_success "Installed: ${selection} → ${agent_dir}/"
+				_ai_info "Restart Claude Code to load the agent"
+				echo ""
+				;;
+
+			*)
+				_ai_error "Unknown agents command: $subcmd"
+				echo ""
+				echo -e "  ${CYAN}ai agents list${RESET}              ${GRAY}List marketplace agents${RESET}"
+				echo -e "  ${CYAN}ai agents install [name]${RESET}    ${GRAY}Install an agent${RESET}"
+				echo ""
+				return 1
+				;;
+		esac
+		;;
+
+	mcp)
+		local subcmd="${1:-list}"
+		shift 2>/dev/null || true
+		local cache="$HOME/.ai-marketplace-cache"
+
+		case "$subcmd" in
+			list)
+				_ai_marketplace_cache_update || { _ai_error "Could not reach marketplace"; return 1; }
+				echo ""
+				_ai_section "Available MCP Servers"
+				echo ""
+				local mcp_dir="$cache/mcp"
+				if [ ! -d "$mcp_dir" ] || [ -z "$(ls "$mcp_dir"/*.json 2>/dev/null)" ]; then
+					_ai_info "No MCP servers in marketplace"
+					echo ""
+					return 0
+				fi
+				local installed_names
+				installed_names=$(claude mcp list 2>/dev/null | awk '{print $1}' || echo "")
+				for f in "$mcp_dir"/*.json; do
+					[ -f "$f" ] || continue
+					local mname mdesc installed_mark=""
+					mname=$(node --input-type=module -e "import{readFileSync}from'fs';const d=JSON.parse(readFileSync(process.argv[1],'utf8'));process.stdout.write(String(d.name||''))" "$f" 2>/dev/null)
+					mdesc=$(node --input-type=module -e "import{readFileSync}from'fs';const d=JSON.parse(readFileSync(process.argv[1],'utf8'));process.stdout.write(String(d.description||''))" "$f" 2>/dev/null | cut -c1-70)
+					echo "$installed_names" | grep -q "^${mname}$" && installed_mark=" ${GREEN}${SYM_CHECK} installed${RESET}"
+					echo -e "  ${CYAN}${SYM_DOT}${RESET} ${BOLD}${WHITE}${mname}${RESET}${installed_mark}"
+					echo -e "     ${GRAY}${mdesc}${RESET}"
+					echo ""
+				done
+				_ai_cmd_hint "ai mcp install [name]" "Install an MCP server"
+				echo ""
+				;;
+
+			install)
+				_ai_marketplace_cache_update || { _ai_error "Could not reach marketplace"; return 1; }
+				if ! command -v claude &>/dev/null && [ ! -d "$HOME/.claude" ]; then
+					_ai_error "claude CLI not found — install Claude Code first"
+					return 1
+				fi
+				local mcp_name="${1:-}"
+				local mcp_dir="$cache/mcp"
+
+				if [ ! -d "$mcp_dir" ]; then
+					_ai_error "No MCP servers found in marketplace"
+					return 1
+				fi
+
+				local -a AVAILABLE=()
+				local i=1
+				echo ""
+				_ai_section "Available MCP Servers"
+				echo ""
+				for f in "$mcp_dir"/*.json; do
+					[ -f "$f" ] || continue
+					local mname mdesc
+					mname=$(node --input-type=module -e "import{readFileSync}from'fs';const d=JSON.parse(readFileSync(process.argv[1],'utf8'));process.stdout.write(String(d.name||''))" "$f" 2>/dev/null)
+					mdesc=$(node --input-type=module -e "import{readFileSync}from'fs';const d=JSON.parse(readFileSync(process.argv[1],'utf8'));process.stdout.write(String(d.description||''))" "$f" 2>/dev/null | cut -c1-60)
+					AVAILABLE+=("$(basename "$f" .json)"$'\x01'"$mname"$'\x01'"$mdesc")
+					echo -e "  ${WHITE}${i}.${RESET} ${CYAN}${mname}${RESET}"
+					echo -e "     ${GRAY}${mdesc}${RESET}"
+					echo ""
+					((i++))
+				done
+
+				if [ ${#AVAILABLE[@]} -eq 0 ]; then
+					_ai_info "No MCP servers available"
+					return 0
+				fi
+
+				local selection=""
+				if [ -n "$mcp_name" ]; then
+					for entry in "${AVAILABLE[@]}"; do
+						IFS=$'\x01' read -r file mname _ <<< "$entry"
+						if [ "$file" = "$mcp_name" ] || [ "$mname" = "$mcp_name" ]; then
+							selection="$file"
+							break
+						fi
+					done
+					[ -z "$selection" ] && { _ai_error "MCP server not found: $mcp_name"; return 1; }
+				else
+					printf "  ${WHITE}Select${RESET} ${GRAY_DIM}(number)${RESET}: "
+					read -r sel < /dev/tty
+					if [[ "$sel" =~ ^[0-9]+$ ]] && [ "$sel" -ge 1 ] && [ "$sel" -le ${#AVAILABLE[@]} ]; then
+						IFS=$'\x01' read -r selection _ _ <<< "${AVAILABLE[$((sel - 1))]}"
+					else
+						_ai_error "Invalid selection"; return 1
+					fi
+				fi
+
+				local def_file="$mcp_dir/${selection}.json"
+				local mname mcmd margs
+				mname=$(node --input-type=module -e "import{readFileSync}from'fs';const d=JSON.parse(readFileSync(process.argv[1],'utf8'));process.stdout.write(String(d.name||''))" "$def_file" 2>/dev/null)
+				mcmd=$(node --input-type=module -e "import{readFileSync}from'fs';const d=JSON.parse(readFileSync(process.argv[1],'utf8'));process.stdout.write(String(d.command||''))" "$def_file" 2>/dev/null)
+				margs=$(node --input-type=module -e "import{readFileSync}from'fs';const d=JSON.parse(readFileSync(process.argv[1],'utf8'));process.stdout.write((d.args||[]).join(' '))" "$def_file" 2>/dev/null)
+
+				echo ""
+				echo -e "  ${WHITE}1${RESET}  User-level ${GRAY_DIM}(all projects)${RESET}"
+				echo -e "  ${WHITE}2${RESET}  Project-level ${GRAY_DIM}(.mcp.json)${RESET}"
+				echo ""
+				printf "  ${WHITE}Scope${RESET} ${GRAY_DIM}(1/2, default 1)${RESET}: "
+				read -r scope < /dev/tty
+				echo ""
+
+				local scope_flag="--scope user"
+				[ "$scope" = "2" ] && scope_flag="--scope project"
+
+				# shellcheck disable=SC2086
+				if claude mcp add $scope_flag "$mname" -- $mcmd $margs 2>/dev/null; then
+					_ai_success "Installed MCP: $mname"
+					_ai_info "Restart Claude Code to load the server"
+				else
+					_ai_error "Failed to install $mname (already installed?)"
+					return 1
+				fi
+				echo ""
+				;;
+
+			*)
+				_ai_error "Unknown mcp command: $subcmd"
+				echo ""
+				echo -e "  ${CYAN}ai mcp list${RESET}              ${GRAY}List marketplace MCP servers${RESET}"
+				echo -e "  ${CYAN}ai mcp install [name]${RESET}    ${GRAY}Install an MCP server${RESET}"
+				echo ""
+				return 1
+				;;
+		esac
+		;;
+
+	plugins)
+		local subcmd="${1:-list}"
+		shift 2>/dev/null || true
+
+		case "$subcmd" in
+			list)
+				echo ""
+				_ai_section "Installed Plugins"
+				echo ""
+				claude plugin list
+				echo ""
+				;;
+
+			install)
+				local plugin_name="${1:-}"
+				if [ -z "$plugin_name" ]; then
+					_ai_error "Usage: ai plugins install <name>"
+					_ai_info "Plugins are installed from @ai-marketplace"
+					return 1
+				fi
+				# Strip suffix if user accidentally included it
+				local clean_plugin="${plugin_name%@ai-marketplace}"
+				claude plugin install "${clean_plugin}@ai-marketplace"
+				;;
+
+			update)
+				local plugin_name="${1:-}"
+				if [ -z "$plugin_name" ]; then
+					echo ""
+					_ai_section "Updating plugins"
+					echo ""
+					claude plugin marketplace update ai-marketplace 2>/dev/null && _ai_success "Marketplace index updated"
+					# Update all installed plugins
+					local plugins_list
+					plugins_list=$(claude plugin list 2>/dev/null | awk 'NR>1{print $1}')
+					while IFS= read -r p; do
+						[ -z "$p" ] && continue
+						if claude plugin update "$p" 2>/dev/null; then
+							_ai_success "Updated: $p"
+						else
+							_ai_warn "Skipped: $p"
+						fi
+					done <<< "$plugins_list"
+					echo ""
+				else
+					claude plugin update "$plugin_name"
+				fi
+				;;
+
+			*)
+				_ai_error "Unknown plugins command: $subcmd"
+				echo ""
+				echo -e "  ${CYAN}ai plugins list${RESET}              ${GRAY}List installed plugins${RESET}"
+				echo -e "  ${CYAN}ai plugins install <name>${RESET}    ${GRAY}Install from ai-marketplace${RESET}"
+				echo -e "  ${CYAN}ai plugins update [name]${RESET}     ${GRAY}Update plugin(s)${RESET}"
+				echo ""
+				return 1
+				;;
+		esac
+		;;
+
 		install)
 			local target="$1"
 
-			if [ "$target" != "agents" ]; then
+			if [ "$target" != "agents" ] && [ "$target" != "skills" ]; then
 				_ai_error "Unknown install target: $target"
-				_ai_info "Available: agents"
+				_ai_info "Available: agents, skills"
 				return 1
 			fi
 
 			local REPO_CLONE="$HOME/.ai-repo-local-clone"
+
+			# ── SKILLS INSTALL ──────────────────────────────────────────────
+			if [ "$target" = "skills" ]; then
+				if [ ! -d "$REPO_CLONE/skills" ]; then
+					_ai_error "Skills not found in local repo"
+					_ai_info "Run 'ai update' first"
+					return 1
+				fi
+
+				echo ""
+				_ai_logo_gradient
+
+				echo -e "${BOLD}${WHITE}Skill Installation${RESET}"
+				echo -e "${GRAY}Install Claude Code slash-command skills${RESET}"
+				echo ""
+				echo -e "${GRAY_DARK}$(printf '%0.s─' $(seq 1 55))${RESET}"
+				echo ""
+
+				local -a AVAILABLE_SKILLS=()
+				local idx=0
+				for skill_dir in "$REPO_CLONE/skills"/*/; do
+					local skill_name
+					skill_name=$(basename "$skill_dir")
+					AVAILABLE_SKILLS+=("$skill_name")
+					idx=$((idx + 1))
+					local desc
+					desc=$(grep -m1 "^description:" "$skill_dir/SKILL.md" 2>/dev/null | sed 's/^description: *"\?\(.*\)"\?$/\1/')
+					echo -e "  ${WHITE}${idx}.${RESET} ${CYAN}${SYM_DOT}${RESET} ${BOLD}${WHITE}${skill_name}${RESET}"
+					echo -e "     ${GRAY}${desc}${RESET}"
+					echo ""
+				done
+
+				echo -e "${GRAY_DARK}$(printf '%0.s─' $(seq 1 55))${RESET}"
+				echo ""
+				printf "${WHITE}Select skills ${GRAY_DIM}(space-separated numbers or 'all')${RESET}: "
+				read -r SKILL_SELECTION < /dev/tty
+				echo ""
+
+				local -a SELECTED_SKILLS=()
+				if [[ "$SKILL_SELECTION" == "all" ]]; then
+					SELECTED_SKILLS=("${AVAILABLE_SKILLS[@]}")
+				else
+					for num in $SKILL_SELECTION; do
+						local sidx=$((num - 1))
+						if [ "$sidx" -ge 0 ] && [ "$sidx" -lt "${#AVAILABLE_SKILLS[@]}" ]; then
+							SELECTED_SKILLS+=("${AVAILABLE_SKILLS[$sidx]}")
+						else
+							_ai_warn "Invalid selection: $num"
+						fi
+					done
+				fi
+
+				if [ ${#SELECTED_SKILLS[@]} -eq 0 ]; then
+					_ai_error "No skills selected"
+					return 1
+				fi
+
+				echo -e "${CYAN}${SYM_SPARK}${RESET} ${BOLD}${WHITE}Install location${RESET}"
+				echo ""
+				echo -e "  ${WHITE}1${RESET}  Project-scoped ${GRAY_DIM}.claude/skills/${RESET}"
+				echo -e "     ${GRAY}Shared with team via git${RESET}"
+				echo ""
+				echo -e "  ${WHITE}2${RESET}  User-scoped ${GRAY_DIM}~/.claude/skills/${RESET}"
+				echo -e "     ${GRAY}Personal only, all projects${RESET}"
+				echo ""
+				printf "  ${WHITE}Selection${RESET} ${GRAY_DIM}(1/2)${RESET}: "
+				read -r SKILL_SCOPE < /dev/tty
+				echo ""
+
+				local SKILLS_DIR
+				if [ "$SKILL_SCOPE" = "1" ]; then
+					SKILLS_DIR=".claude/skills"
+				else
+					SKILLS_DIR="$HOME/.claude/skills"
+				fi
+
+				mkdir -p "$SKILLS_DIR"
+
+				for skill_name in "${SELECTED_SKILLS[@]}"; do
+					local src="$REPO_CLONE/skills/$skill_name/SKILL.md"
+					local dest_dir="$SKILLS_DIR/$skill_name"
+					if [ -f "$src" ]; then
+						mkdir -p "$dest_dir"
+						cp "$src" "$dest_dir/SKILL.md"
+						_ai_success "$skill_name"
+					else
+						_ai_error "$skill_name ${GRAY_DIM}(source not found)${RESET}"
+					fi
+				done
+
+				echo ""
+				echo -e "${GRAY_DARK}$(printf '%0.s─' $(seq 1 55))${RESET}"
+				echo ""
+				_ai_success "Installation complete"
+				echo ""
+				_ai_info "Restart Claude Code to load skills"
+				echo ""
+				return 0
+			fi
+			# ── END SKILLS INSTALL ──────────────────────────────────────────
 
 			if [ ! -d "$REPO_CLONE/agents" ]; then
 				_ai_error "Agents not found in local repo"
@@ -782,6 +1250,9 @@ ai() {
 			_ai_agent_card "3" "Docs Engineer" "Sam" "$CYAN" "Clear, accurate, shippable documentation"
 			_ai_agent_card "4" "Docs Architect" "Emerson" "$EMERALD" "Narrative-driven, award-worthy docs"
 			_ai_agent_card "5" "Systems Thinker" "Jan" "$AMBER" "Deep problem solving, first-principles"
+			_ai_agent_card "6" "Compiler Expert" "Kai" "$BLUE" "Parsers, compilers, ASTs, and optimization"
+			_ai_agent_card "7" "Systems Engineer" "Riley" "$CYAN" "Infrastructure, reliability, and operations"
+			_ai_agent_card "8" "Hardware Engineer" "Quinn" "$GREEN" "Embedded systems and hardware/firmware"
 
 			echo -e "${GRAY_DARK}$(printf '%0.s─' $(seq 1 55))${RESET}"
 			echo ""
@@ -812,6 +1283,9 @@ ai() {
 						3) SELECTED_AGENTS+=("${AGENTS[2]}") ;;
 						4) SELECTED_AGENTS+=("${AGENTS[3]}") ;;
 						5) SELECTED_AGENTS+=("${AGENTS[4]}") ;;
+						6) SELECTED_AGENTS+=("${AGENTS[5]}") ;;
+						7) SELECTED_AGENTS+=("${AGENTS[6]}") ;;
+						8) SELECTED_AGENTS+=("${AGENTS[7]}") ;;
 						*) _ai_warn "Invalid selection: $num" ;;
 					esac
 				done
@@ -954,19 +1428,30 @@ EOF
 			echo ""
 			echo -e "${CYAN}${SYM_SPARK}${RESET} ${BOLD}${WHITE}Commands${RESET}"
 			echo ""
-			echo -e "  ${CYAN}ai init${RESET}             ${GRAY}Initialize directory with AI dev best practices${RESET}"
-			echo -e "  ${CYAN}ai install agents${RESET}   ${GRAY}Install agent definitions into Claude/Codex${RESET}"
+			echo -e "  ${CYAN}ai init${RESET}                    ${GRAY}Initialize directory with AI dev best practices${RESET}"
 			echo ""
-			echo -e "  ${CYAN}ai update${RESET}           ${GRAY}Update local repo, shell function & migrations${RESET}"
-			echo -e "  ${CYAN}ai update-all${RESET}       ${GRAY}Update all registered directories${RESET}"
+			echo -e "  ${CYAN}ai agents list${RESET}             ${GRAY}List agents in marketplace${RESET}"
+			echo -e "  ${CYAN}ai agents install [name]${RESET}   ${GRAY}Install an agent to ~/.claude/agents/${RESET}"
 			echo ""
-			echo -e "  ${CYAN}ai migrate${RESET}          ${GRAY}Run pending migrations (up|down|status)${RESET}"
+			echo -e "  ${CYAN}ai mcp list${RESET}                ${GRAY}List MCP servers in marketplace${RESET}"
+			echo -e "  ${CYAN}ai mcp install [name]${RESET}      ${GRAY}Install an MCP server via claude mcp add${RESET}"
 			echo ""
-			echo -e "  ${CYAN}ai list${RESET}             ${GRAY}List registered directories${RESET}"
-			echo -e "  ${CYAN}ai forget${RESET}           ${GRAY}Remove current directory from registry${RESET}"
+			echo -e "  ${CYAN}ai plugins list${RESET}            ${GRAY}List installed Claude Code plugins${RESET}"
+			echo -e "  ${CYAN}ai plugins install <name>${RESET}  ${GRAY}Install plugin from ai-marketplace${RESET}"
 			echo ""
-			echo -e "  ${CYAN}ai version${RESET}          ${GRAY}Show version information${RESET}"
-			echo -e "  ${CYAN}ai help${RESET}             ${GRAY}Show this help message${RESET}"
+			echo -e "  ${CYAN}ai install agents${RESET}          ${GRAY}Install built-in agents to Claude/Codex${RESET}"
+			echo -e "  ${CYAN}ai install skills${RESET}          ${GRAY}Install built-in skills to Claude Code${RESET}"
+			echo ""
+			echo -e "  ${CYAN}ai update${RESET}                  ${GRAY}Update repo, shell fn, marketplace & plugins${RESET}"
+			echo -e "  ${CYAN}ai update-all${RESET}              ${GRAY}Update all registered directories${RESET}"
+			echo ""
+			echo -e "  ${CYAN}ai migrate${RESET}                 ${GRAY}Run pending migrations (up|down|status)${RESET}"
+			echo ""
+			echo -e "  ${CYAN}ai list${RESET}                    ${GRAY}List registered directories${RESET}"
+			echo -e "  ${CYAN}ai forget${RESET}                  ${GRAY}Remove current directory from registry${RESET}"
+			echo ""
+			echo -e "  ${CYAN}ai version${RESET}                 ${GRAY}Show version information${RESET}"
+			echo -e "  ${CYAN}ai help${RESET}                    ${GRAY}Show this help message${RESET}"
 			echo ""
 			echo -e "${GRAY_DARK}$(printf '%0.s─' $(seq 1 55))${RESET}"
 			echo ""
