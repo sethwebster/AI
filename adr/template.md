@@ -2,8 +2,8 @@
 
 **Status**: Proposed | Accepted | Deprecated | Superseded by ADR-XXX
 **Date**: YYYY-MM-DD
-**Deciders**: @username, @agent-name
-**Consulted**: @username, @agent-name
+**Deciders**: @username
+**Consulted**: @username
 
 ## Context
 What is the issue/problem we're facing? What constraints exist?
@@ -52,4 +52,3 @@ How we'll verify this decision was correct:
 - [Related ADR-XXX](./adr-xxx-title.md)
 - [External documentation](https://...)
 - [GitHub issue #123](https://...)
-

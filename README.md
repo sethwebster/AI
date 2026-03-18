@@ -1,148 +1,172 @@
 # AI
 
-Personal tools, configs, and guidelines for AI development.
+Enterprise-grade reference materials for AI-assisted development teams.
 
-## Contents
+This repository is your onboarding bridge, command center, and guardrail layer for building and running AI agent workflows with consistent quality and speed.
 
-- **[AGENTS.md](./AGENTS.md)** - Enterprise-grade agent development guide
-  - Code quality standards
-  - Architecture patterns
-  - Testing requirements
-  - Security best practices
-  - Performance optimization
-  - ADR workflow for architectural decisions
-- **[AGENT-WORKSPACE.md](./AGENT-WORKSPACE.md)** - Workspace-specific template
-  - Project context and setup
-  - Development commands
-  - Current work tracking
-  - Project-specific patterns
+## What you get
 
-## Purpose
+- **Guidance-first operations**: AGENTS + workspace templates keep every directory aligned.
+- **Reliable bootstrap**: `ai init` wires in shared conventions in one step.
+- **Fleet-wide updates**: Registry tooling updates every initialized directory together.
+- **Production posture**: Explicit architecture, testing, and review expectations baked in.
 
-Reference materials and configurations for building production AI systems.
+## Start here (recommended)
 
-## Installation
+1. Install the CLI
+2. Initialize your project directory
+3. Run updates as your agent network evolves
 
-### Quick Install (Recommended)
+### 1) Install
 
-Install via npx (no download required):
+Install with `npx` (no global dependencies required):
 
 ```bash
 npx @sethwebster/ai-cli
 ```
 
-Or install globally via npm:
+Or install globally:
 
 ```bash
 npm install -g @sethwebster/ai-cli
 ```
 
-Then reload your shell and initialize your project:
+Then reload your shell and initialize:
 
 ```bash
-source ~/.zshrc  # or ~/.bashrc for bash
+source ~/.zshrc  # or source ~/.bashrc
 ai init
 ```
 
-### Alternative: Direct Install
+### 2) Alternative install paths
 
-Install with curl (no Node.js required):
+If you prefer script-based setup:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/install.sh | bash
 ```
 
-### Manual Installation
-
-Add the function to your shell config:
+Or install only the shell function manually:
 
 ```bash
-# Download the function
 curl -fsSL https://raw.githubusercontent.com/sethwebster/AI/main/ai-function.sh >> ~/.zshrc
-
-# Reload your shell
 source ~/.zshrc
-
-# Initialize a project
 ai init
 ```
 
-## Structure
+## Project structure
 
-```
+```text
 AI/
 ├── agents/              # Agent definitions
 ├── bin/
 │   └── install.js       # npm installer script
 ├── landing-page/        # Documentation website
 ├── migrations/          # Migration system
-├── AGENTS.md            # Agent dev guidelines
-├── AGENT-WORKSPACE.md   # Workspace template
+├── AGENTS.md            # Universal development guardrails
+├── AGENT-WORKSPACE.md   # Workspace-specific template
 ├── ai-function.sh       # Shell function definition
 ├── install.sh           # Installer script
 ├── package.json         # npm package config
 └── README.md            # This file
 ```
 
-## Usage
-
-### AI CLI
+## CLI command map
 
 ```bash
-ai init        # Initialize directory with AGENTS.md and AGENT-WORKSPACE.md
-ai update      # Update local repo with latest changes
-ai update-all  # Update all registered directories
-ai list        # List all registered directories
+ai init        # Prepare current directory with AGENTS + workspace template
+ai update      # Pull latest AI repo changes into local clone
+ai reload      # Reload shell profile so ai function updates take effect immediately
+ai update-all  # Update all directories registered for management
+ai list        # Show all registered directories
 ai forget      # Remove current directory from registry
 ```
 
-### How `ai init` Works
+## What `ai init` actually does
 
-1. **Clone/update repo**: Clones or updates `~/.ai-repo-local-clone` (shallow clone)
-2. **Create symlinks**: Creates symlinks in current directory:
+1. Updates `~/.ai-repo-local-clone` (shallow clone) to keep references current.
+2. Creates stable symlinks in the target directory:
    - `AGENTS.md` → `~/.ai-repo-local-clone/AGENTS.md`
    - `CLAUDE.md` → `~/.ai-repo-local-clone/CLAUDE.md`
-3. **Copy template**: Copies `AGENT-WORKSPACE.md` template (if not exists)
-4. **Register directory**: Adds current directory to `~/.ai-registry` for bulk updates
+3. Copies `AGENT-WORKSPACE.md` from template (only when missing).
+4. Registers the directory in `~/.ai-registry` for bulk operations.
 
-This means your `AGENTS.md` and `CLAUDE.md` always stay up-to-date via symlinks. Run `ai update` to refresh the local repo.
+That is why `ai update` remains your safest path for synced guidance updates.
 
-### Registry System
+## Registry model
 
-The registry tracks all initialized directories to enable bulk updates:
+The registry is a plain-text file at `~/.ai-registry` with one directory per line.
 
-- **`ai list`** - Shows all registered directories (marks missing ones with ✗)
-- **`ai update-all`** - Updates all registered directories in one command
-- **`ai forget`** - Removes current directory from registry (doesn't delete files)
+- **`ai list`**  
+  Enumerates active managed directories and marks missing paths.
+- **`ai reload`**  
+  Reloads your shell profile (`~/.zshrc`/`~/.bashrc`) so local `ai` function updates apply right away.
+- **`ai update-all`**  
+  Applies updates across all tracked directories in one run.
+- **`ai forget`**  
+  Removes the current directory from the registry without deleting local files.
 
-Registry location: `~/.ai-registry` (plain text, one path per line)
+## Who should read what first
 
-### For AI Agents
+### For AI agents
 
-**Read in this order:**
-1. **[AGENTS.md](./AGENTS.md)** - Universal best practices
-2. **[AGENT-WORKSPACE.md](./AGENT-WORKSPACE.md)** - Workspace-specific context
+Read in this order:
 
-### For Developers
+1. `AGENTS.md` – universal safety, quality, and architecture expectations.
+2. `AGENT-WORKSPACE.md` – project-specific patterns and current context.
 
-Consult AGENTS.md when:
-- Building AI agent systems
-- Making architectural decisions (create ADR first)
-- Establishing code standards for new projects
-- Training agents on production practices
-- Reviewing code quality
+### For developers
 
-Use AGENT-WORKSPACE.md to:
-- Document project-specific patterns
-- Track current work and context
-- Define development commands
-- Provide workspace setup instructions
+Use `AGENTS.md` when you are:
 
-## Key Principles
+- Designing new AI agent systems.
+- Making architecture decisions (ADRs included).
+- Defining quality standards or review policy.
+- Onboarding teams to production-style AI workflows.
 
-- Explicit over implicit
-- Fail fast, fail loud
-- Optimize for deletion
-- Test-first development (non-negotiable)
-- ADRs required for architectural decisions
-- Zero tolerance for weak types, magic values, commented code
+Then use `AGENT-WORKSPACE.md` to capture:
+
+- Local setup and command conventions.
+- Active work tracking.
+- Project-specific operating rules.
+
+## Website deployment (Next.js)
+
+The documentation site is in `landing-page/`.
+
+### Production target
+
+- Domain: `ai.sethwebster.com`
+- Platform: Vercel (recommended)
+- CI: `.github/workflows/deploy-landing-page.yml`
+
+### Quick deployment
+
+```bash
+cd landing-page
+npm install
+npm run deploy:prod
+```
+
+### Required Vercel config
+
+- Set project root directory to `landing-page/` in Vercel
+- Add `ai.sethwebster.com` in Vercel domain settings
+- Add GitHub secrets:
+  - `VERCEL_TOKEN`
+  - `VERCEL_ORG_ID`
+  - `VERCEL_PROJECT_ID`
+
+## Key principles to keep in view
+
+- Explicit over implicit.
+- Fail fast, fail loud.
+- Optimize for deletion.
+- Test-first development mindset.
+- ADR discipline for architectural decisions.
+- Strict typing and disciplined error boundaries.
+
+## Why this matters
+
+Without a stable baseline, AI projects drift into inconsistent quality, hidden assumptions, and avoidable rework.  
+This repository keeps teams moving in the same direction: faster iteration, better decision records, and fewer downstream surprises.

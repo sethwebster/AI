@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Landing Page (`landing-page`)
 
-## Getting Started
+Documentation site for the AI tooling ecosystem. Built with Next.js (App Router + MDX).
 
-First, run the development server:
+## Prerequisites
+
+- Node.js 20+
+- npm, pnpm, yarn, or bun
+- A Vercel account (recommended for production deployment)
+- Domain ownership for `ai.sethwebster.com`
+
+## Local development
 
 ```bash
+cd landing-page
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production deployment (recommended on Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Add the repo project in Vercel using `landing-page/` as the root directory.
+2. Set framework preset to **Next.js**.
+3. Deploy to production.
+4. In Vercel Domains, add `ai.sethwebster.com`.
+5. Point DNS:
+   - `ai.sethwebster.com` → Vercel-provided CNAME (`cname.vercel-dns.com`) at your registrar.
+6. Wait for TLS provisioning and propagation.
 
-## Learn More
+### One-command deploy
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cd landing-page
+npm run deploy:prod
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### GitHub Actions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+A workflow is included at:
 
-## Deploy on Vercel
+- `.github/workflows/deploy-landing-page.yml`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+It deploys the `landing-page/` app to Vercel on push to `main`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Required secrets:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+## Useful commands
+
+```bash
+npm run build   # production build check
+npm run lint    # lint + quality checks
+npm run start   # run built Next.js app locally
+```
+
+## Why this structure works
+
+This app is intentionally isolated in `landing-page/` so website updates and CLI releases can be managed independently.

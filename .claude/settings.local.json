@@ -36,7 +36,19 @@
       "Bash(gh release view:*)",
       "Bash(npx @sethwebster/ai-cli@1.2.1:*)",
       "Bash(npx ai-cli@1.2.1)",
-      "Bash(timeout 10 npx:*)"
+      "Bash(timeout 10 npx:*)",
+      "Bash(npm run bump:minor:*)",
+      "Bash(npm publish:*)",
+      "Bash(npm pkg:*)",
+      "Bash(npm run bump:patch:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3:*)",
+      "Bash(head:*)",
+      "Bash(claude plugin:*)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "redwoodjs"
+  ]
 }

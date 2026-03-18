@@ -1,0 +1,29 @@
+name: Deploy landing-page to ai.sethwebster.com
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "landing-page/**"
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          working-directory: landing-page
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: "--prod"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
